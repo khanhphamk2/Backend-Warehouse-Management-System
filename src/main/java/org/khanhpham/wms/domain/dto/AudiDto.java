@@ -1,11 +1,11 @@
-package org.khanhpham.whs.domain.dto;
+package org.khanhpham.wms.domain.dto;
 
 import lombok.Value;
 
 import java.time.LocalDateTime;
 
 /**
- * DTO for {@link org.khanhpham.whs.domain.model.AudiEntity}
+ * DTO for {@link org.khanhpham.wms.domain.model.AudiEntity}
  */
 @Value
 public class AudiDto {

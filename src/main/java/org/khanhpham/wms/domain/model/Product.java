@@ -1,4 +1,4 @@
-package org.khanhpham.whs.domain.model;
+package org.khanhpham.wms.domain.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -43,6 +44,9 @@ public class Product extends AudiEntity {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
+
+    @OneToMany(mappedBy = "product")
+    private List<InventoryItem> inventoryItems;
 
     @Override
     public String toString(){

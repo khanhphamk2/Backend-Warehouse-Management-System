@@ -1,4 +1,4 @@
-package org.khanhpham.whs;
+package org.khanhpham.wms;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

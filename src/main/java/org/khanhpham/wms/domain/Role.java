@@ -1,8 +1,8 @@
-package org.khanhpham.whs.domain;
+package org.khanhpham.wms.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.khanhpham.whs.domain.model.AudiEntity;
+import org.khanhpham.wms.domain.model.AudiEntity;
 
 @Setter
 @Getter

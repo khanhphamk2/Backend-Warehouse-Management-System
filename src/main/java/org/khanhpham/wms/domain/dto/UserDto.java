@@ -1,10 +1,10 @@
-package org.khanhpham.whs.domain.dto;
+package org.khanhpham.wms.domain.dto;
 
 import lombok.Value;
-import org.khanhpham.whs.common.UserRole;
+import org.khanhpham.wms.common.UserRole;
 
 /**
- * DTO for {@link org.khanhpham.whs.domain.model.User}
+ * DTO for {@link org.khanhpham.wms.domain.model.User}
  */
 @Value
 public class UserDto {

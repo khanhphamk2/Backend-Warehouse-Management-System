@@ -1,4 +1,4 @@
-package org.khanhpham.whs.exception;
+package org.khanhpham.wms.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

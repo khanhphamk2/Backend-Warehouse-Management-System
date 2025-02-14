@@ -1,4 +1,4 @@
-package org.khanhpham.whs.domain.model;
+package org.khanhpham.wms.domain.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

@@ -1,4 +1,4 @@
-package org.khanhpham.whs.exception;
+package org.khanhpham.wms.exception;
 
 public class ResourceNotFoundException extends RuntimeException {
     public ResourceNotFoundException(String resourceName, String fieldName, Object fieldValue) {

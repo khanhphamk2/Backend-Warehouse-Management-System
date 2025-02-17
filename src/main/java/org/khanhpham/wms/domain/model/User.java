@@ -1,22 +1,17 @@
-package org.khanhpham.whs.domain.model;
+package org.khanhpham.wms.domain.model;
 
 import jakarta.persistence.*;
-import jakarta.transaction.Transaction;
 import lombok.*;
-import org.khanhpham.whs.common.UserRole;
-
-import java.util.List;
+import org.khanhpham.wms.common.UserRole;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
-@RequiredArgsConstructor
 @Entity
 @Builder
 @Table(name = "users")
-public class User extends AudiEntity {
+public class User extends AuditEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

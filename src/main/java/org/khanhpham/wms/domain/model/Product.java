@@ -1,12 +1,17 @@
-package org.khanhpham.whs.domain.model;
+package org.khanhpham.wms.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -15,7 +20,7 @@ import java.time.LocalDateTime;
 @Entity
 @Builder
 @Table(name = "products")
-public class Product extends AudiEntity {
+public class Product extends AuditEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,6 +29,7 @@ public class Product extends AudiEntity {
 
     private String description;
 
+    @NotNull
     private BigDecimal price;
 
     //Stock Keeping Unit
@@ -31,29 +37,30 @@ public class Product extends AudiEntity {
     @NotBlank(message = "SKU is required")
     private String sku;
 
-    @Min(value = 0, message = "Stock quantity must be greater than 0")
-    private Integer stockQuantity;
-
     private LocalDateTime expiryDate;
 
     private String unit;
 
     private String imageUrl;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Category category;
+    @ManyToMany
+    @JoinTable(
+            name = "product_categories",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private Set<Category> categories;
 
-    @Override
-    public String toString(){
-        return "Product (" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", sku='" + sku + '\'' +
-                ", price=" + price +
-                ", stockQuantity=" + stockQuantity +
-                ", description='" + description + '\'' +
-                ", expiryDate=" + expiryDate +
-                ", imageUrl='" + imageUrl + ")";
-    }
+    @ManyToOne
+    @JoinColumn(name = "warehouse_id")
+    private Warehouse warehouse;
+
+    @ManyToOne
+    @JoinColumn(name = "supplier_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
+    private Supplier supplier;
+
+    @OneToMany(mappedBy = "product")
+    private List<InventoryItem> inventoryItems;
 }

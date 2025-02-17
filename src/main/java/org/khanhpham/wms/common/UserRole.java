@@ -1,4 +1,4 @@
-package org.khanhpham.whs.common;
+package org.khanhpham.wms.common;
 
 public enum UserRole {
     ROLE_USER,

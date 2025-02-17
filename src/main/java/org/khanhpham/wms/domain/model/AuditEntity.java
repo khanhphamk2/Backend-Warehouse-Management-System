@@ -1,4 +1,4 @@
-package org.khanhpham.whs.domain.model;
+package org.khanhpham.wms.domain.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
@@ -17,9 +17,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public abstract class AudiEntity {
+public abstract class AuditEntity {
     @Column(name = "created_date")
     private LocalDateTime createdDate = LocalDateTime.now();
     @Column(name = "updated_date")
     private LocalDateTime updatedDate;
+    @Column(name = "created_by")
+    private String createdBy;
+    @Column(name = "updated_by")
+    private String updatedBy;
 }

@@ -1,4 +1,5 @@
 package org.khanhpham.wms.domain.model;
+package org.khanhpham.wms.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;

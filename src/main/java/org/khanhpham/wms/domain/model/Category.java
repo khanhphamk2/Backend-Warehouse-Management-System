@@ -21,4 +21,7 @@ public class Category extends AuditEntity {
     @Column(name = "name")
     @NotBlank(message = "Name is mandatory")
     private String name;
+
+    @Column(name = "description")
+    private String description;
 }

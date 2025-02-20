@@ -67,13 +67,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 //        return new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
 //    }
 
-//    @ExceptionHandler(CustomException.class)
-//    @ResponseStatus(HttpStatus.CONFLICT)
-//    public ResponseEntity<ErrorDetails> handleConflictException(CustomException exception,
-//                                                                WebRequest webRequest) {
-//        ErrorDetails errorDetails = createErrorDetails(exception, webRequest);
-//        return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
-//    }
+    @ExceptionHandler(ResourceAlreadyExistException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ResponseEntity<ErrorDetails> handleConflictException(ResourceAlreadyExistException exception,
+                                                                WebRequest webRequest) {
+        ErrorDetails errorDetails = createErrorDetails(exception, webRequest);
+        return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
+    }
 
     private ErrorDetails createErrorDetails(Exception exception, WebRequest webRequest) {
         String cause = (exception.getCause() != null) ? exception.getCause().getMessage() : "N/A";

@@ -3,11 +3,14 @@ package org.khanhpham.wms.service.impl;
 import org.khanhpham.wms.domain.dto.CustomerDTO;
 import org.khanhpham.wms.domain.model.Customer;
 import org.khanhpham.wms.domain.request.CustomerRequest;
+import org.khanhpham.wms.domain.response.PaginationResponse;
 import org.khanhpham.wms.exception.ResourceNotFoundException;
 import org.khanhpham.wms.repository.CustomerRepository;
 import org.khanhpham.wms.service.CustomerService;
+import org.khanhpham.wms.utils.PaginationUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +18,7 @@ import java.util.Optional;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
+    private static final String CUSTOMER = "Customer";
     private final CustomerRepository customerRepository;
     private final ModelMapper modelMapper;
 
@@ -48,7 +52,7 @@ public class CustomerServiceImpl implements CustomerService {
                     }
                 })
                 .map(this::convertToDTO)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer", "identity", identity));
+                .orElseThrow(() -> new ResourceNotFoundException(CUSTOMER, "identity", identity));
     }
 
     @Override
@@ -63,14 +67,14 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public CustomerDTO updateCustomer(Long id, CustomerDTO customerDTO) {
+    public CustomerDTO updateCustomer(Long id, CustomerRequest customerRequest) {
         Customer customer = customerRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer", "id", id));
+                .orElseThrow(() -> new ResourceNotFoundException(CUSTOMER, "id", id));
 
-        customer.setAddress(customerDTO.getAddress());
-        customer.setEmail(customerDTO.getEmail());
-        customer.setName(customerDTO.getName());
-        customer.setPhone(customerDTO.getPhone());
+        customer.setAddress(customerRequest.getAddress());
+        customer.setEmail(customerRequest.getEmail());
+        customer.setName(customerRequest.getName());
+        customer.setPhone(customerRequest.getPhone());
 
         return convertToDTO(customerRepository.save(customer));
     }
@@ -78,21 +82,27 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public void deleteCustomer(Long id) {
         Customer customer = customerRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer", "id", id));
+                .orElseThrow(() -> new ResourceNotFoundException(CUSTOMER, "id", id));
         customerRepository.delete(customer);
     }
 
     @Override
-    public List<CustomerDTO> getAllCustomers() {
-        return customerRepository.findAll().stream()
+    public PaginationResponse<CustomerDTO> getAllCustomers(int pageNumber, int pageSize, String sortBy, String sortDir) {
+        Page<Customer> customers = customerRepository.findAll(
+                PaginationUtils.convertToPageable(pageNumber, pageSize, sortBy, sortDir)
+        );
+        List<CustomerDTO> content = customers.getContent()
+                .stream()
                 .map(this::convertToDTO)
                 .toList();
+
+        return PaginationUtils.createPaginationResponse(content, customers);
     }
 
     @Override
     public CustomerDTO getCustomerById(Long id) {
         return customerRepository.findById(id)
                 .map(this::convertToDTO)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer", "id", id));
+                .orElseThrow(() -> new ResourceNotFoundException(CUSTOMER, "id", id));
     }
 }

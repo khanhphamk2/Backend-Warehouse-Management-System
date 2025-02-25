@@ -17,9 +17,16 @@ public class Customer extends AuditEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name = "phone", nullable = false, unique = true)
     private String phone;
+
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
+
+    @Column(name="address")
     private String address;
 
     @OneToMany(mappedBy = "customer")

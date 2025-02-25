@@ -2,14 +2,13 @@ package org.khanhpham.wms.service;
 
 import org.khanhpham.wms.domain.dto.CustomerDTO;
 import org.khanhpham.wms.domain.request.CustomerRequest;
-
-import java.util.List;
+import org.khanhpham.wms.domain.response.PaginationResponse;
 
 public interface CustomerService {
     CustomerDTO findByIdentity(String identity);
     CustomerDTO createCustomer(CustomerRequest customerRequest);
-    CustomerDTO updateCustomer(Long id, CustomerDTO customerDTO);
+    CustomerDTO updateCustomer(Long id, CustomerRequest customerRequest);
     void deleteCustomer(Long id);
-    List<CustomerDTO> getAllCustomers();
+    PaginationResponse<CustomerDTO> getAllCustomers(int pageNumber, int pageSize, String sortBy, String sortDir);
     CustomerDTO getCustomerById(Long id);
 }

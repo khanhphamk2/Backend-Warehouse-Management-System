@@ -12,8 +12,9 @@ import java.time.Instant;
 @Getter
 @Setter
 public class ErrorDetails {
-    private final Instant timestamp;
-    private final String message;
+    private final String title;
+    private final int status;
+    private final Object message;
     private final String details;
-    private final String cause;
+    private final Instant timestamp;
 }

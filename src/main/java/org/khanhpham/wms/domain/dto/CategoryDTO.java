@@ -17,4 +17,5 @@ public class CategoryDTO extends AuditDTO {
     Long id;
     @NotBlank(message = "Name is mandatory")
     String name;
+    String description;
 }

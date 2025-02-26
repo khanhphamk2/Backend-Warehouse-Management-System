@@ -2,29 +2,37 @@ package org.khanhpham.wms.domain.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.proxy.HibernateProxy;
 
 import java.util.List;
-import java.util.Objects;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Builder
+@Builder(toBuilder = true)
 @Table(name = "warehouses")
 public class Warehouse extends AuditEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
     private String location;
+
     @ManyToOne
     @JoinColumn(name = "manager_id")
     private User manager;
+
+    @Column(nullable = false)
     private String address;
+
+    @Column(nullable = false, unique = true)
     private String warehouseCode;
+
     private String description;
 
     @OneToMany(mappedBy = "warehouse")

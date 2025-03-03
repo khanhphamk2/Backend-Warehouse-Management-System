@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -23,4 +24,7 @@ public class Category extends AuditEntity {
 
     @Column(name = "description", nullable = true)
     private String description;
+
+    @ManyToMany(mappedBy = "categories")
+    private Set<Product> products;
 }

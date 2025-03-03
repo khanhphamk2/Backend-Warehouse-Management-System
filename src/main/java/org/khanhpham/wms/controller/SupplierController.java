@@ -6,9 +6,11 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
+import org.khanhpham.wms.domain.dto.ProductDTO;
 import org.khanhpham.wms.domain.dto.SupplierDTO;
 import org.khanhpham.wms.domain.request.SupplierRequest;
 import org.khanhpham.wms.domain.response.PaginationResponse;
+import org.khanhpham.wms.service.ProductService;
 import org.khanhpham.wms.service.SupplierService;
 import org.khanhpham.wms.utils.AppConstants;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +20,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("${spring.data.rest.base-path}/suppliers")
 public class SupplierController {
     private final SupplierService supplierService;
+    private final ProductService productService;
 
-    public SupplierController(SupplierService supplierService) {
+    public SupplierController(SupplierService supplierService, ProductService productService) {
         this.supplierService = supplierService;
+        this.productService = productService;
     }
 
     @Operation(
@@ -100,5 +104,25 @@ public class SupplierController {
             @PathVariable Long id) {
         supplierService.deleteSupplier(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(
+            summary = "Get products by supplier ID",
+            description = "API to get a paginated list of products by the provided supplier ID"
+    )
+    @GetMapping("/{id}/products")
+    public ResponseEntity<PaginationResponse<ProductDTO>> getProductsBySupplierId(
+            @Parameter(description = "ID of the supplier", example = "1")
+            @PathVariable Long id,
+            @Parameter(description = "Current page number (starting from 0)", example = "0")
+            @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNumber,
+            @Parameter(description = "Number of results per page", example = "10")
+            @RequestParam(value = "limit", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+            @Parameter(description = "Field to sort by", example = "id")
+            @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
+            @Parameter(description = "Sort direction: ASC or DESC", example = "ASC")
+            @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir
+    ) {
+        return ResponseEntity.ok(productService.getProductsBySupplierId(id, pageNumber, pageSize, sortBy, sortDir));
     }
 }

@@ -2,8 +2,6 @@ package org.khanhpham.wms.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -25,22 +23,26 @@ public class Product extends AuditEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
 
+    @Column(columnDefinition = "TEXT")
     private String description;
 
-    @NotNull
+    @Column(nullable = false)
     private BigDecimal price;
 
     //Stock Keeping Unit
     @Column(unique = true, nullable = false)
-    @NotBlank(message = "SKU is required")
     private String sku;
 
+    @Column(nullable = false)
     private LocalDateTime expiryDate;
 
+    @Column(nullable = false)
     private String unit;
 
+    @Column(nullable = false)
     private String imageUrl;
 
     @ManyToMany
@@ -51,16 +53,20 @@ public class Product extends AuditEntity {
     )
     private Set<Category> categories;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "warehouse_id")
+    @JsonIgnore
     private Warehouse warehouse;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "supplier_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private Supplier supplier;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JsonIgnore
     private List<InventoryItem> inventoryItems;
 }

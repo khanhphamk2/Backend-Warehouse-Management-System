@@ -15,5 +15,7 @@ import java.time.LocalDateTime;
 @Data
 public abstract class AuditDTO {
     LocalDateTime createdDate;
-    LocalDateTime updatedDate;
+    String createdBy;
+    LocalDateTime lastModifiedDate;
+    String lastModifiedBy;
 }

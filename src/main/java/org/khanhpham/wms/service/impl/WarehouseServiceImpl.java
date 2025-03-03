@@ -108,4 +108,10 @@ public class WarehouseServiceImpl implements WarehouseService {
                 .toList();
         return PaginationUtils.createPaginationResponse(content, warehouses);
     }
+
+    @Override
+    public Warehouse getWarehouse(Long id) {
+        return warehouseRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(WAREHOUSE, "id", id));
+    }
 }

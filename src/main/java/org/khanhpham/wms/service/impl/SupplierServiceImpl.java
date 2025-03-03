@@ -104,4 +104,11 @@ public class SupplierServiceImpl implements SupplierService {
                 .toList();
         return PaginationUtils.createPaginationResponse(content, suppliers);
     }
+
+    @Override
+    public Supplier getSupplierById(Long id) {
+        return supplierRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(SUPPLIER, "id", id));
+    }
+
 }

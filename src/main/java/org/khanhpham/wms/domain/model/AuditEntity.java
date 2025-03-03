@@ -20,10 +20,13 @@ import java.time.LocalDateTime;
 public abstract class AuditEntity {
     @Column(name = "created_date")
     private LocalDateTime createdDate = LocalDateTime.now();
-    @Column(name = "updated_date")
-    private LocalDateTime updatedDate;
+
     @Column(name = "created_by")
     private String createdBy;
-    @Column(name = "updated_by")
-    private String updatedBy;
+
+    @Column(name = "last_modified")
+    private LocalDateTime lastModifiedDate;
+
+    @Column(name = "last_modified_by")
+    private String lastModifiedBy;
 }

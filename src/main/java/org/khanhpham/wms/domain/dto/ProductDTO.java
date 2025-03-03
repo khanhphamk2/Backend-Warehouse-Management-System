@@ -16,6 +16,7 @@ import java.util.Set;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -30,8 +31,8 @@ public class ProductDTO extends AuditDTO {
     LocalDateTime expiryDate;
     String unit;
     String imageUrl;
-    Set<Long> categoryIds;
-    Long warehouseId;
-    Long supplierId;
-    List<Long> inventoryItemIds;
+    Set<CategoryDTO> categories;
+    WarehouseDTO warehouse;
+    SupplierDTO supplier;
+    InventoryItemDTO inventoryItem;
 }

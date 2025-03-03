@@ -31,11 +31,6 @@ public class User extends AuditEntity {
     @Column(name = "phone", nullable = false, unique = true)
     private String phone;
 
-//    @Column(name = "address", nullable = false)
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-//    @ToString.Exclude
-//    private List<Transaction> transactions;
-
     @Column(name = "role", nullable = false)
     private UserRole role;
 }

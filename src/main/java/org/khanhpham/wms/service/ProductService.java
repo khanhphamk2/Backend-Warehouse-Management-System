@@ -1,6 +1,7 @@
 package org.khanhpham.wms.service;
 
 import org.khanhpham.wms.domain.dto.ProductDTO;
+import org.khanhpham.wms.domain.model.Product;
 import org.khanhpham.wms.domain.request.ProductRequest;
 import org.khanhpham.wms.domain.response.PaginationResponse;
 
@@ -18,4 +19,5 @@ public interface ProductService {
     PaginationResponse<ProductDTO> getProductsBySupplierId(Long supplierId, int pageNumber, int pageSize, String sortBy, String sortDir);
     PaginationResponse<ProductDTO> getProductsByPrice(BigDecimal price, int pageNumber, int pageSize, String sortBy, String sortDir);
     PaginationResponse<ProductDTO> getProductsByPriceRange(Double min, Double max, int pageNumber, int pageSize, String sortBy, String sortDir);
+    Product findById(Long id);
 }

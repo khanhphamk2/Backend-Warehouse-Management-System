@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 @Data
@@ -27,14 +26,14 @@ public class ProductRequest {
     @NotBlank(message = "Supplier is required")
     private Long supplierId;
 
-    @NotBlank(message = "Warehouse is required")
-    private Long warehouseId;
-
     @NotBlank(message = "SKU is required")
     private String sku;
 
     @NotBlank(message = "Price is required")
     private BigDecimal price;
+
+    @NotBlank(message = "Quantity is required")
+    private Integer quantity;
 
     @NotBlank(message = "Quantity is required")
     private LocalDateTime expiryDate;
@@ -44,6 +43,4 @@ public class ProductRequest {
 
     @NotBlank(message = "Image URL is required")
     private String imageUrl;
-
-    private List<Long> inventoryItemsId;
 }

@@ -3,6 +3,7 @@ package org.khanhpham.wms.domain.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Set;
 
@@ -19,6 +20,7 @@ public class PurchaseOrderDTO extends AuditDTO {
     Long supplierId;
     Instant orderDate;
     Instant receiveDate;
+    BigDecimal totalAmount;
     String status;
-    Set<Long> orderItemIds;
+    Set<PurchaseOrderItemDTO> orderItems;
 }

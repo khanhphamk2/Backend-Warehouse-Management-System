@@ -110,7 +110,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
-    public Warehouse getWarehouse(Long id) {
+    public Warehouse findById(Long id) {
         return warehouseRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(WAREHOUSE, "id", id));
     }

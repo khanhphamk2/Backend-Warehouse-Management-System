@@ -7,21 +7,15 @@ import org.khanhpham.wms.domain.dto.ProductDTO;
 import org.khanhpham.wms.domain.model.Category;
 import org.khanhpham.wms.domain.model.Product;
 import org.khanhpham.wms.domain.model.Supplier;
-import org.khanhpham.wms.domain.model.Warehouse;
 import org.khanhpham.wms.domain.request.ProductRequest;
 import org.khanhpham.wms.domain.response.PaginationResponse;
 import org.khanhpham.wms.exception.ResourceAlreadyExistException;
-import org.khanhpham.wms.repository.CategoryRepository;
 import org.khanhpham.wms.repository.ProductRepository;
-import org.khanhpham.wms.repository.SupplierRepository;
-import org.khanhpham.wms.repository.WarehouseRepository;
 import org.khanhpham.wms.service.CategoryService;
 import org.khanhpham.wms.service.ProductService;
 import org.khanhpham.wms.service.SupplierService;
-import org.khanhpham.wms.service.WarehouseService;
 import org.khanhpham.wms.utils.PaginationUtils;
 import org.modelmapper.ModelMapper;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +37,6 @@ public class ProductServiceImpl implements ProductService {
     private final ModelMapper modelMapper;
     private final CategoryService categoryService;
     private final SupplierService supplierService;
-    private final WarehouseService warehouseService;
 
     private ProductDTO convertToDTO(Product product) {
         return modelMapper.map(product, ProductDTO.class);
@@ -51,7 +44,6 @@ public class ProductServiceImpl implements ProductService {
 
     private Product convertToEntity(ProductRequest request) {
         Supplier supplier = supplierService.getSupplierById(request.getSupplierId());
-        Warehouse warehouse = warehouseService.getWarehouse(request.getWarehouseId());
         List<Category> categories = categoryService.getAllById(request.getCategoryIds());
         return Product.builder()
                 .name(request.getName())
@@ -60,21 +52,22 @@ public class ProductServiceImpl implements ProductService {
                 .sku(request.getSku())
                 .expiryDate(request.getExpiryDate())
                 .unit(request.getUnit())
+                .quantity(request.getQuantity())
                 .imageUrl(request.getImageUrl())
                 .supplier(supplier)
-                .warehouse(warehouse)
                 .categories(new HashSet<>(categories))
                 .build();
     }
 
     @Override
     public ProductDTO createProduct(ProductRequest request) {
-        if (productRepository.existsBySku(request.getSku())) {
+        if (Boolean.FALSE.equals(productRepository.existsBySku(request.getSku()))) {
+            Product product = convertToEntity(request);
+
+            return convertToDTO(productRepository.save(product));
+        } else {
             throw new ResourceAlreadyExistException(PRODUCT, "sku", request.getSku());
         }
-        Product product = convertToEntity(request);
-
-        return convertToDTO(productRepository.save(product));
     }
 
     @Override
@@ -200,5 +193,11 @@ public class ProductServiceImpl implements ProductService {
 
         product.getCategories().retainAll(newCategories);
         product.getCategories().addAll(newCategories);
+    }
+
+    @Override
+    public Product findById(Long id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(MessageFormat.format(PRODUCT_NOT_FOUND_MESSAGE, id)));
     }
 }

@@ -5,10 +5,10 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.khanhpham.wms.common.ProductStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -45,6 +45,12 @@ public class Product extends AuditEntity {
     @Column(nullable = false)
     private String imageUrl;
 
+    @Column(nullable = false)
+    private Integer quantity;
+
+    @Column(nullable = false)
+    private ProductStatus status = ProductStatus.ACTIVE;
+
     @ManyToMany
     @JoinTable(
             name = "product_categories",
@@ -54,19 +60,8 @@ public class Product extends AuditEntity {
     private Set<Category> categories;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "warehouse_id")
-    @JsonIgnore
-    private Warehouse warehouse;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "supplier_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private Supplier supplier;
-
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnore
-    private List<InventoryItem> inventoryItems;
 }

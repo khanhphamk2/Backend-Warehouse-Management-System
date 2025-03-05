@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.khanhpham.wms.common.ProductStatus;
+import org.khanhpham.wms.domain.model.Product;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -30,9 +32,10 @@ public class ProductDTO extends AuditDTO {
     String sku;
     LocalDateTime expiryDate;
     String unit;
+    @NotBlank(message = "Image URL is required")
     String imageUrl;
+    Integer quantity;
+    ProductStatus status;
     Set<CategoryDTO> categories;
-    WarehouseDTO warehouse;
     SupplierDTO supplier;
-    InventoryItemDTO inventoryItem;
 }

@@ -11,5 +11,5 @@ public interface WarehouseService {
     WarehouseDTO getWarehouseById(Long id);
     void deleteWarehouseById(Long id);
     PaginationResponse<WarehouseDTO> getAllWarehouses(int pageNumber, int pageSize, String sortBy, String sortDir);
-    Warehouse getWarehouse(Long id);
+    Warehouse findById(Long id);
 }

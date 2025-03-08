@@ -5,12 +5,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.khanhpham.wms.common.ProductStatus;
-import org.khanhpham.wms.domain.model.Product;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -34,7 +31,7 @@ public class ProductDTO extends AuditDTO {
     String unit;
     @NotBlank(message = "Image URL is required")
     String imageUrl;
-    Integer quantity;
+    int quantity;
     ProductStatus status;
     Set<CategoryDTO> categories;
     SupplierDTO supplier;

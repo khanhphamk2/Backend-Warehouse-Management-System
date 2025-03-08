@@ -34,7 +34,4 @@ public class Warehouse extends AuditEntity {
     private String warehouseCode;
 
     private String description;
-
-    @OneToMany(mappedBy = "warehouse")
-    private List<InventoryItem> inventoryItems;
 }

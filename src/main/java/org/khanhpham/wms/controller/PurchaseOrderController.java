@@ -3,16 +3,15 @@ package org.khanhpham.wms.controller;
 import lombok.RequiredArgsConstructor;
 import org.khanhpham.wms.common.OrderStatus;
 import org.khanhpham.wms.domain.dto.PurchaseOrderDTO;
-import org.khanhpham.wms.domain.model.PurchaseOrder;
 import org.khanhpham.wms.domain.request.PurchaseOrderRequest;
+import org.khanhpham.wms.domain.response.PaginationResponse;
 import org.khanhpham.wms.service.PurchaseOrderService;
+import org.khanhpham.wms.utils.AppConstants;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.List;
 
 @RestController
 @RequestMapping("${spring.data.rest.base-path}/purchase-orders")
@@ -20,57 +19,63 @@ import java.util.List;
 public class PurchaseOrderController {
     private final PurchaseOrderService purchaseOrderService;
 
-    @PostMapping
-    public ResponseEntity<PurchaseOrderDTO> createPurchaseOrder(@RequestBody PurchaseOrderRequest request) {
-        PurchaseOrderDTO createdOrder = purchaseOrderService.createPurchaseOrder(request);
+    @PostMapping("/process")
+    public ResponseEntity<PurchaseOrderDTO> processPurchaseOrder(@RequestBody PurchaseOrderRequest request) {
+        PurchaseOrderDTO createdOrder = purchaseOrderService.processPurchaseOrder(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<PurchaseOrder> updatePurchaseOrder(@PathVariable Long id, @RequestBody PurchaseOrder purchaseOrder) {
-        PurchaseOrder updatedOrder = purchaseOrderService.updatePurchaseOrder(id, purchaseOrder);
-        return ResponseEntity.ok(updatedOrder);
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<PurchaseOrder> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(purchaseOrderService.findById(id));
-    }
-
-    @GetMapping
-    public ResponseEntity<List<PurchaseOrder>> findAll() {
-        return ResponseEntity.ok(purchaseOrderService.findAll());
+    @GetMapping("/{orderId}")
+    public ResponseEntity<PurchaseOrderDTO> getPurchaseOrder(@PathVariable Long orderId) {
+        return ResponseEntity.ok(purchaseOrderService.getPurchaseOrder(orderId));
     }
 
     @GetMapping("/supplier/{supplierId}")
-    public ResponseEntity<List<PurchaseOrder>> findBySupplier(@PathVariable Long supplierId) {
-        return ResponseEntity.ok(purchaseOrderService.findBySupplier(supplierId));
+    public ResponseEntity<PaginationResponse<PurchaseOrderDTO>> getPurchaseOrdersBySupplierId(
+            @PathVariable Long supplierId,
+            @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNumber,
+            @RequestParam(value = "limit", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+            @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir)
+    {
+        return ResponseEntity.ok(purchaseOrderService.getPurchaseOrdersBySupplierId(supplierId, pageNumber, pageSize, sortBy, sortDir));
     }
 
-    @GetMapping("/status/{status}")
-    public ResponseEntity<List<PurchaseOrder>> findByStatus(@PathVariable OrderStatus status) {
-        return ResponseEntity.ok(purchaseOrderService.findByStatus(status));
+    @GetMapping("/all")
+    public ResponseEntity<PaginationResponse<PurchaseOrderDTO>> getPurchaseOrders(
+            @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNumber,
+            @RequestParam(value = "limit", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+            @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir
+    ) {
+         return ResponseEntity.ok(purchaseOrderService.getAllPurchaseOrders(pageNumber, pageSize, sortBy, sortDir));
     }
 
-    @GetMapping("/date-range")
-    public ResponseEntity<List<PurchaseOrder>> findByDateRange(
-            @RequestParam Instant startDate, @RequestParam Instant endDate) {
-        return ResponseEntity.ok(purchaseOrderService.findByDateRange(startDate, endDate));
+    @GetMapping("/by-status")
+    public ResponseEntity<PaginationResponse<PurchaseOrderDTO>> getPurchaseOrdersByStatus(
+            @RequestParam(value = "status", required = false) OrderStatus status,
+            @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNumber,
+            @RequestParam(value = "limit", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+            @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir)
+    {
+        return ResponseEntity.ok(purchaseOrderService.findByStatus(status, pageNumber, pageSize, sortBy, sortDir));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePurchaseOrder(@PathVariable Long id) {
-        purchaseOrderService.deletePurchaseOrder(id);
-        return ResponseEntity.noContent().build();
+    @GetMapping("/by-date-range")
+    public ResponseEntity<PaginationResponse<PurchaseOrderDTO>> getPurchaseOrdersByDateRange(
+            @RequestParam(value = "startDate", required = false) Instant startDate,
+            @RequestParam(value = "endDate", required = false) Instant endDate,
+            @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNumber,
+            @RequestParam(value = "limit", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+            @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir)
+    {
+        return ResponseEntity.ok(purchaseOrderService.findByDateRange(startDate, endDate, pageNumber, pageSize, sortBy, sortDir));
     }
 
-    @PatchMapping("/{id}/status")
-    public ResponseEntity<PurchaseOrder> updateOrderStatus(@PathVariable Long id, @RequestParam OrderStatus status) {
-        return ResponseEntity.ok(purchaseOrderService.updateOrderStatus(id, status));
-    }
-
-    @GetMapping("/{id}/recalculate-total")
-    public ResponseEntity<BigDecimal> recalculateTotalAmount(@PathVariable Long id) {
-        return ResponseEntity.ok(purchaseOrderService.recalculateTotalAmount(id));
+    @PatchMapping("/{orderId}/status")
+    public ResponseEntity<PurchaseOrderDTO> changeOrderStatus(@PathVariable Long orderId, @RequestBody OrderStatus status) {
+        return ResponseEntity.ok(purchaseOrderService.updateOrderStatus(orderId, status));
     }
 }

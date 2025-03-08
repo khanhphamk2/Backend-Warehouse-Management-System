@@ -200,4 +200,9 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(MessageFormat.format(PRODUCT_NOT_FOUND_MESSAGE, id)));
     }
+
+    @Override
+    public void save(Product product) {
+        productRepository.save(product);
+    }
 }

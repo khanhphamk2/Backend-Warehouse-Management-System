@@ -46,7 +46,6 @@ public class WarehouseServiceImpl implements WarehouseService {
                 .location(StringUtils.trim(warehouseRequest.getLocation()))
                 .manager(getManagerFromId(warehouseRequest.getManagerId()))
                 .description(StringUtils.trim(warehouseRequest.getDescription()))
-                .inventoryItems(new ArrayList<>())
                 .build();
     }
 

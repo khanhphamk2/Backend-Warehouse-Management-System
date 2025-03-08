@@ -46,7 +46,7 @@ public class Product extends AuditEntity {
     private String imageUrl;
 
     @Column(nullable = false)
-    private Integer quantity;
+    private int quantity;
 
     @Column(nullable = false)
     private ProductStatus status = ProductStatus.ACTIVE;

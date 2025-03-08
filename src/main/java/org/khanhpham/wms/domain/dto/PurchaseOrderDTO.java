@@ -5,7 +5,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.Set;
+import java.util.List;
 
 /**
  * DTO for {@link org.khanhpham.wms.domain.model.PurchaseOrder}
@@ -22,5 +22,5 @@ public class PurchaseOrderDTO extends AuditDTO {
     Instant receiveDate;
     BigDecimal totalAmount;
     String status;
-    Set<PurchaseOrderItemDTO> orderItems;
+    List<ShortProductDTO> products;
 }

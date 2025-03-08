@@ -30,12 +30,12 @@ public class PurchaseOrder extends AuditEntity {
     @Column(nullable = false)
     private Instant receiveDate;
 
-    @Column(nullable = false)
-    private OrderStatus status = OrderStatus.PROCESSING;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
 
     @Column(name = "total_amount", nullable = false)
     private BigDecimal totalAmount;
 
-    @OneToMany(mappedBy = "purchaseOrder")
-    private Set<PurchaseOrderItem> orderItems;
+    @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL)
+    private Set<PurchaseOrderItem> purchaseOrderItems;
 }

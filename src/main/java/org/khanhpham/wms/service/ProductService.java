@@ -20,4 +20,5 @@ public interface ProductService {
     PaginationResponse<ProductDTO> getProductsByPrice(BigDecimal price, int pageNumber, int pageSize, String sortBy, String sortDir);
     PaginationResponse<ProductDTO> getProductsByPriceRange(Double min, Double max, int pageNumber, int pageSize, String sortBy, String sortDir);
     Product findById(Long id);
+    void save(Product product);
 }

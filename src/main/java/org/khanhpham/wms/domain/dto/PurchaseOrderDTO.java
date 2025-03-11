@@ -2,9 +2,10 @@ package org.khanhpham.wms.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
+import org.khanhpham.wms.common.OrderStatus;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -18,9 +19,9 @@ import java.util.List;
 public class PurchaseOrderDTO extends AuditDTO {
     Long id;
     Long supplierId;
-    Instant orderDate;
-    Instant receiveDate;
+    LocalDate orderDate;
+    LocalDate receiveDate;
     BigDecimal totalAmount;
-    String status;
+    OrderStatus status;
     List<ShortProductDTO> products;
 }

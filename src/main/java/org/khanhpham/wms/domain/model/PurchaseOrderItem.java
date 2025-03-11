@@ -17,11 +17,11 @@ public class PurchaseOrderItem extends AuditEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "purchase_order_id", nullable = false)
     private PurchaseOrder purchaseOrder;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
@@ -29,5 +29,20 @@ public class PurchaseOrderItem extends AuditEntity {
     private int quantity;
 
     @Column(nullable = false)
-    private BigDecimal price;
+    private BigDecimal unitPrice;
+
+    @Column(nullable = false)
+    private BigDecimal totalPrice;
+
+    private String notes;
+
+    @PrePersist
+    @PreUpdate
+    protected void calculateTotalPrice() {
+        if (unitPrice != null && quantity > 0) {
+            totalPrice = unitPrice.multiply(BigDecimal.valueOf(quantity));
+        } else {
+            totalPrice = BigDecimal.ZERO;
+        }
+    }
 }

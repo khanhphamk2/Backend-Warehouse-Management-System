@@ -3,9 +3,9 @@ package org.khanhpham.wms.domain.request;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.khanhpham.wms.domain.dto.ProductPurchaseDTO;
+import org.khanhpham.wms.domain.dto.OrderItemDTO;
 
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -13,7 +13,9 @@ import java.util.List;
 @NoArgsConstructor
 public class PurchaseOrderRequest {
     private Long supplierId;
-    private Instant orderDate;
-    private Instant receiveDate;
-    private List<ProductPurchaseDTO> products;
+    private LocalDate orderDate;
+    private LocalDate receiveDate;
+    private List<OrderItemDTO> products;
+    private String notes;
+
 }

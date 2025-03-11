@@ -3,6 +3,7 @@ package org.khanhpham.wms.controller;
 import lombok.RequiredArgsConstructor;
 import org.khanhpham.wms.common.OrderStatus;
 import org.khanhpham.wms.domain.dto.PurchaseOrderDTO;
+import org.khanhpham.wms.domain.request.OrderStatusRequest;
 import org.khanhpham.wms.domain.request.PurchaseOrderRequest;
 import org.khanhpham.wms.domain.response.PaginationResponse;
 import org.khanhpham.wms.service.PurchaseOrderService;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("${spring.data.rest.base-path}/purchase-orders")
@@ -64,8 +66,8 @@ public class PurchaseOrderController {
 
     @GetMapping("/by-date-range")
     public ResponseEntity<PaginationResponse<PurchaseOrderDTO>> getPurchaseOrdersByDateRange(
-            @RequestParam(value = "startDate", required = false) Instant startDate,
-            @RequestParam(value = "endDate", required = false) Instant endDate,
+            @RequestParam(value = "startDate", required = false) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) LocalDate endDate,
             @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNumber,
             @RequestParam(value = "limit", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
             @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
@@ -75,7 +77,7 @@ public class PurchaseOrderController {
     }
 
     @PatchMapping("/{orderId}/status")
-    public ResponseEntity<PurchaseOrderDTO> changeOrderStatus(@PathVariable Long orderId, @RequestBody OrderStatus status) {
-        return ResponseEntity.ok(purchaseOrderService.updateOrderStatus(orderId, status));
+    public ResponseEntity<PurchaseOrderDTO> changeOrderStatus(@PathVariable Long orderId, @RequestBody OrderStatusRequest request) {
+        return ResponseEntity.ok(purchaseOrderService.updateOrderStatus(orderId, request));
     }
 }

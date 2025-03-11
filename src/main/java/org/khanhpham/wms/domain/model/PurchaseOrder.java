@@ -6,6 +6,7 @@ import org.khanhpham.wms.common.OrderStatus;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Set;
 
 @Getter
@@ -20,21 +21,26 @@ public class PurchaseOrder extends AuditEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, nullable = false)
+    private String poNumber;
+
     @ManyToOne
     @JoinColumn(name = "supplier_id")
     private Supplier supplier;
 
     @Column(nullable = false)
-    private Instant orderDate;
+    private LocalDate orderDate;
 
     @Column(nullable = false)
-    private Instant receiveDate;
+    private LocalDate receiveDate;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
     @Column(name = "total_amount", nullable = false)
     private BigDecimal totalAmount;
+
+    private String notes;
 
     @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL)
     private Set<PurchaseOrderItem> purchaseOrderItems;

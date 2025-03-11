@@ -11,8 +11,9 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ProductPurchaseDTO {
+public class OrderItemDTO {
     private Long productId;
     private int quantity;
-    private BigDecimal purchasePrice;
+    private BigDecimal unitPrice;
+    private String notes;
 }

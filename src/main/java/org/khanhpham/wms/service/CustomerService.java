@@ -1,6 +1,7 @@
 package org.khanhpham.wms.service;
 
 import org.khanhpham.wms.domain.dto.CustomerDTO;
+import org.khanhpham.wms.domain.model.Customer;
 import org.khanhpham.wms.domain.request.CustomerRequest;
 import org.khanhpham.wms.domain.response.PaginationResponse;
 
@@ -11,4 +12,5 @@ public interface CustomerService {
     void deleteCustomer(Long id);
     PaginationResponse<CustomerDTO> getAllCustomers(int pageNumber, int pageSize, String sortBy, String sortDir);
     CustomerDTO getCustomerById(Long id);
+    Customer findById(Long id);
 }

@@ -2,10 +2,13 @@ package org.khanhpham.wms.domain.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
+import org.khanhpham.wms.common.OrderStatus;
 import org.khanhpham.wms.domain.model.SalesOrder;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -18,10 +21,15 @@ import java.util.List;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SalesOrderDTO extends AuditDTO {
-    LocalDateTime updatedDate;
-    Long id;
-    Long customerId;
-    Instant orderDate;
-    String status;
-    List<Long> orderItemIds;
+    private Long id;
+    private Long customerId;
+    private LocalDate orderDate;
+    private LocalDate expectedShipmentDate;
+    private BigDecimal subtotal;
+    private BigDecimal taxAmount;
+    private BigDecimal shippingCost;
+    private BigDecimal discount;
+    private BigDecimal totalAmount;
+    OrderStatus status;
+    List<ShortProductDTO> products;
 }

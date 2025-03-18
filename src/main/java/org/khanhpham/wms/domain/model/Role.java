@@ -3,6 +3,8 @@ package org.khanhpham.wms.domain.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Set;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,3 +21,4 @@ public class Role {
 
     private String description;
 }
+

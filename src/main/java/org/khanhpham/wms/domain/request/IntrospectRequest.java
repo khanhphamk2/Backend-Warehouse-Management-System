@@ -3,11 +3,11 @@ package org.khanhpham.wms.domain.request;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class RefreshTokenRequest {
-    private String refreshToken;
+public class IntrospectRequest {
+    String token;
 }

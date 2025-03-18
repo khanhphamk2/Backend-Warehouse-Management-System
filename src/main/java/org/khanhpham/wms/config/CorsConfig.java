@@ -20,4 +20,18 @@ public class CorsConfig {
             }
         };
     }
+
+//    @Bean
+//    CorsConfigurationSource corsConfiguration() {
+//        CorsConfiguration corsConfig = new CorsConfiguration();
+//        corsConfig.applyPermitDefaultValues();
+//        corsConfig.setAllowedOrigins(Collections.singletonList("*"));
+//        corsConfig.setAllowedMethods(Collections.singletonList("*"));
+//        corsConfig.setAllowedHeaders(Collections.singletonList("*"));
+//
+//        UrlBasedCorsConfigurationSource source =
+//                new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", corsConfig);
+//        return source;
+//    }
 }

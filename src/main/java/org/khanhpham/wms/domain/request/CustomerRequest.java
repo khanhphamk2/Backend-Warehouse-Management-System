@@ -5,11 +5,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @AllArgsConstructor
 @Data
-@Builder
 @Getter
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CustomerRequest {
     @NotNull(message = "Email is required")
     @NotBlank(message = "Email is required")

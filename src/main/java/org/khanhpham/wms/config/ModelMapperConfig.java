@@ -47,7 +47,7 @@ public class ModelMapperConfig {
             @Override
             protected void configure() {
                 map().setProductId(source.getId());
-                map().setImageUrl(source.getImageUrl() != null && !source.getImageUrl().isEmpty() ? source.getImageUrl() : "");
+                map().setImageUrl(source.getImageUrl());
             }
         });
 

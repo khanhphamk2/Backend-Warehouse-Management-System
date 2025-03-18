@@ -1,13 +1,14 @@
-package org.khanhpham.wms.domain.request;
+package org.khanhpham.wms.domain.response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+@Builder
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
-@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class RefreshTokenRequest {
-    private String refreshToken;
+public class RoleResponse {
+    String name;
+    String description;
 }

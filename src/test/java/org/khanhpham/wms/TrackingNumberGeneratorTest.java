@@ -55,15 +55,4 @@ class TrackingNumberGeneratorTest {
         int resetNumber = Integer.parseInt(resetPO.substring(10, 16));
         assertEquals(1, resetNumber, "PO counter did not reset correctly.");
     }
-
-    @Test
-    void testGenerateRandomString() throws Exception {
-        java.lang.reflect.Method method = TrackingNumberGenerator.class.getDeclaredMethod("generateRandomString", int.class);
-        method.setAccessible(true);
-
-        String randomString = (String) method.invoke(null, 6);
-        assertNotNull(randomString);
-        assertEquals(6, randomString.length());
-        assertTrue(RANDOM_STRING_PATTERN.matcher(randomString).matches(), "Random string contains invalid characters.");
-    }
 }

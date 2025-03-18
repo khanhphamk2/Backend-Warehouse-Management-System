@@ -3,12 +3,15 @@ package org.khanhpham.wms.config;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import net.datafaker.Faker;
+import org.khanhpham.wms.common.OrderStatus;
 import org.khanhpham.wms.domain.model.*;
 import org.khanhpham.wms.repository.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -24,8 +27,14 @@ public class DataSeeder implements CommandLineRunner {
     private final CategoryRepository categoryRepository;
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
+    private final PurchaseOrderRepository purchaseOrderRepository;
+    private final SalesOrderRepository salesOrderRepository;
 
-    private static final String PASSWORD = "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9";
+    @Value("${spring.security.user.name}")
+    private String username;
+
+    @Value("${spring.security.user.password}")
+    private String password;
 
     private final Faker faker = new Faker();
 
@@ -38,6 +47,8 @@ public class DataSeeder implements CommandLineRunner {
         seedCategories();
         seedCustomers();
         seedProducts();
+        seedPurchaseOrders();
+        seedSalesOrders();
     }
 
     private void seedRoles() {
@@ -63,10 +74,10 @@ public class DataSeeder implements CommandLineRunner {
         if (userRepository.count() == 0) {
             List<Role> roles = roleRepository.findAll();
 
-            IntStream.range(0, 100).forEach(i -> {
+            IntStream.range(0, 500).forEach(i -> {
                 User user = new User();
                 user.setUsername(faker.internet().username());
-                user.setPassword(PASSWORD);
+                user.setPassword(password);
                 user.setName(faker.name().fullName());
                 user.setEmail(faker.internet().emailAddress());
                 user.setPhone(faker.phoneNumber().phoneNumber());
@@ -77,12 +88,23 @@ public class DataSeeder implements CommandLineRunner {
 
                 userRepository.save(user);
             });
+
+            User admin = new User();
+            admin.setUsername(username);
+            admin.setPassword(password);
+            admin.setName("Admin");
+            admin.setEmail("admin@gmail.com");
+            admin.setPhone("0123456789");
+            Set<Role> adminRoles = new HashSet<>(roleRepository.findAll());
+            admin.setRoles(adminRoles);
+
+            userRepository.save(admin);
         }
     }
 
     private void seedSuppliers() {
         if (supplierRepository.count() == 0) {
-            IntStream.range(0, 100).forEach(i -> {
+            IntStream.range(0, 300).forEach(i -> {
                 Supplier supplier = new Supplier();
                 supplier.setName(faker.company().name());
                 supplier.setContactInfo(faker.internet().emailAddress());
@@ -98,7 +120,7 @@ public class DataSeeder implements CommandLineRunner {
 
     private void seedCustomers() {
         if (customerRepository.count() == 0) {
-            IntStream.range(0, 100).forEach(i -> {
+            IntStream.range(0, 300).forEach(i -> {
                 Customer customer = new Customer();
                 customer.setName(faker.name().fullName());
                 customer.setPhone(faker.phoneNumber().cellPhone());
@@ -112,7 +134,7 @@ public class DataSeeder implements CommandLineRunner {
 
     private void seedCategories() {
         if (categoryRepository.count() == 0) {
-            IntStream.range(0, 30).forEach(i -> {
+            IntStream.range(0, 50).forEach(i -> {
                 String name = faker.commerce().department();
                 if (!categoryRepository.existsByName(name)) {
                     Category category = new Category();
@@ -130,7 +152,7 @@ public class DataSeeder implements CommandLineRunner {
             List<Supplier> suppliers = supplierRepository.findAll();
             List<Category> categories = categoryRepository.findAll();
 
-            IntStream.range(0, 300).forEach(i -> {
+            IntStream.range(0, 1000).forEach(i -> {
                 Product product = new Product();
                 product.setName(faker.commerce().productName());
                 product.setDescription(faker.lorem().paragraph());
@@ -146,6 +168,79 @@ public class DataSeeder implements CommandLineRunner {
                 product.setCategories(productCategories);
 
                 productRepository.save(product);
+            });
+        }
+    }
+
+    private void seedPurchaseOrders() {
+        if (purchaseOrderRepository.count() == 0) {
+            List<Supplier> suppliers = supplierRepository.findAll();
+            List<Product> products = productRepository.findAll();
+
+            IntStream.range(0, 500).forEach(i -> {
+                PurchaseOrder po = new PurchaseOrder();
+                po.setPoNumber(faker.code().isbn13());
+                po.setSupplier(suppliers.get(faker.random().nextInt(suppliers.size())));
+                po.setOrderDate(LocalDate.now().minusDays(faker.number().numberBetween(1, 30)));
+                po.setReceiveDate(po.getOrderDate().plusDays(faker.number().numberBetween(1, 10)));
+                po.setStatus(OrderStatus.PROCESSING);
+                po.setTotalAmount(BigDecimal.ZERO);
+                po.setNotes(faker.lorem().sentence());
+
+                Set<PurchaseOrderItem> items = new HashSet<>();
+                IntStream.range(0, faker.number().numberBetween(1, 10)).forEach(j -> {
+                    Product product = products.get(faker.random().nextInt(products.size()));
+                    PurchaseOrderItem item = new PurchaseOrderItem();
+                    item.setPurchaseOrder(po);
+                    item.setProduct(product);
+                    item.setQuantity(faker.number().numberBetween(1, 10));
+                    item.setUnitPrice(product.getPrice());
+                    items.add(item);
+                });
+
+                po.setPurchaseOrderItems(items);
+                po.setTotalAmount(items.stream().map(PurchaseOrderItem::getTotalPrice).reduce(BigDecimal.ZERO, BigDecimal::add));
+
+                purchaseOrderRepository.save(po);
+            });
+        }
+    }
+
+    private void seedSalesOrders() {
+        if (salesOrderRepository.count() == 0) {
+            List<Customer> customers = customerRepository.findAll();
+            List<Product> products = productRepository.findAll();
+
+            IntStream.range(0, 500).forEach(i -> {
+                SalesOrder so = new SalesOrder();
+                so.setSoNumber(faker.code().isbn13());
+                so.setCustomer(customers.get(faker.random().nextInt(customers.size())));
+                so.setOrderDate(LocalDate.now().minusDays(faker.number().numberBetween(1, 30)));
+                so.setExpectedShipmentDate(so.getOrderDate().plusDays(faker.number().numberBetween(1, 10)));
+                so.setStatus(OrderStatus.PROCESSING);
+                so.setSubtotal(BigDecimal.ZERO);
+                so.setTaxAmount(BigDecimal.ZERO);
+                so.setShippingCost(BigDecimal.valueOf(faker.number().randomDouble(2, 5, 50)));
+                so.setDiscount(BigDecimal.ZERO);
+                so.setTotalAmount(BigDecimal.ZERO);
+                so.setNotes(faker.lorem().sentence());
+
+                Set<SalesOrderItem> items = new HashSet<>();
+                IntStream.range(0, faker.number().numberBetween(1, 10)).forEach(j -> {
+                    Product product = products.get(faker.random().nextInt(products.size()));
+                    SalesOrderItem item = new SalesOrderItem();
+                    item.setSalesOrder(so);
+                    item.setProduct(product);
+                    item.setQuantity(faker.number().numberBetween(1, 10));
+                    item.setUnitPrice(product.getPrice());
+                    items.add(item);
+                });
+
+                so.setSalesOrderItems(items);
+                so.setSubtotal(items.stream().map(SalesOrderItem::getTotalPrice).reduce(BigDecimal.ZERO, BigDecimal::add));
+                so.setTotalAmount(so.getSubtotal().add(so.getTaxAmount()).add(so.getShippingCost()).subtract(so.getDiscount()));
+
+                salesOrderRepository.save(so);
             });
         }
     }

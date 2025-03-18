@@ -1,8 +1,7 @@
 package org.khanhpham.wms.domain.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.khanhpham.wms.domain.dto.OrderItemDTO;
 
 import java.math.BigDecimal;
@@ -12,6 +11,8 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class SalesOrderRequest {
     private Long customerId;
     private LocalDate orderDate;

@@ -7,10 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.khanhpham.wms.domain.dto.UserDTO;
 import org.khanhpham.wms.service.UserService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("${spring.data.rest.base-path}/users")
@@ -30,9 +27,15 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "User not found"),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
-    @GetMapping("{identity}")
+    @GetMapping("/identity")
     public ResponseEntity<UserDTO> getUserByIdentity(
-            @Parameter(description = "The identity of the user to be retrieved") @PathVariable String identity){
+            @Parameter(description = "The identity of the user to be retrieved") @RequestParam String identity){
         return ResponseEntity.ok(userService.findByIdentity(identity));
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity<UserDTO> getUserById(
+            @Parameter(description = "The ID of the user to be retrieved") @PathVariable Long id){
+        return ResponseEntity.ok(userService.findById(id));
     }
 }

@@ -3,11 +3,15 @@ package org.khanhpham.wms.domain.request;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Set;
+
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class RefreshTokenRequest {
-    private String refreshToken;
+public class RoleRequest {
+    String name;
+    String description;
+    Set<String> permissions;
 }

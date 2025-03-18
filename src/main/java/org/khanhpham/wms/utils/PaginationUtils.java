@@ -13,7 +13,7 @@ import java.util.List;
 public class PaginationUtils {
     public static <T> PaginationResponse<T> createPaginationResponse(List<T> content, Page<?> page) {
         PaginationResponse<T> response = new PaginationResponse<>();
-        response.setDatas(content);
+        response.setData(content);
         response.setLimit(page.getSize());
         response.setPage(page.getNumber() + 1);
         response.setTotalResults(page.getTotalElements());

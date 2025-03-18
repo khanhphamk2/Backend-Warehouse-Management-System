@@ -1,10 +1,8 @@
 package org.khanhpham.wms.domain.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
-
-import java.util.List;
 
 /**
  * DTO for {@link org.khanhpham.wms.domain.model.Category}
@@ -15,7 +13,10 @@ import java.util.List;
 @Data
 public class CategoryDTO extends AuditDTO {
     Long id;
+
     @NotBlank(message = "Name is mandatory")
+    @Size(max = 255, message = "Name must be at most 255 characters")
     String name;
+
     String description;
 }

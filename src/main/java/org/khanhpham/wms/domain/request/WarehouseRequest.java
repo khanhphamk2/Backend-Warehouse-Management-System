@@ -1,11 +1,16 @@
 package org.khanhpham.wms.domain.request;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.FieldDefaults;
 
 @AllArgsConstructor
 @Data
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class WarehouseRequest {
     @NotBlank(message = "Name is required")
     private String name;

@@ -1,7 +1,8 @@
-package org.khanhpham.wms.config;
+package org.khanhpham.wms.database;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.datafaker.Faker;
 import org.khanhpham.wms.common.OrderStatus;
 import org.khanhpham.wms.domain.model.*;
@@ -13,12 +14,11 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.IntStream;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class DataSeeder implements CommandLineRunner {
     private final UserRepository userRepository;
@@ -37,6 +37,7 @@ public class DataSeeder implements CommandLineRunner {
     private String password;
 
     private final Faker faker = new Faker();
+    private final Random random = new Random();
 
     @Override
     @Transactional
@@ -67,7 +68,8 @@ public class DataSeeder implements CommandLineRunner {
 
             List<Role> roles = List.of(adminRole, userRole, managerRole);
             roleRepository.saveAll(roles);
-        }
+        } else
+            log.info("Roles already exist");
     }
 
     private void seedUsers() {
@@ -99,7 +101,8 @@ public class DataSeeder implements CommandLineRunner {
             admin.setRoles(adminRoles);
 
             userRepository.save(admin);
-        }
+        } else
+            log.info("Users already exist");
     }
 
     private void seedSuppliers() {
@@ -115,7 +118,8 @@ public class DataSeeder implements CommandLineRunner {
 
                 supplierRepository.save(supplier);
             });
-        }
+        } else
+            log.info("Suppliers already exist");
     }
 
     private void seedCustomers() {
@@ -129,7 +133,8 @@ public class DataSeeder implements CommandLineRunner {
 
                 customerRepository.save(customer);
             });
-        }
+        } else
+            log.info("Customers already exist");
     }
 
     private void seedCategories() {
@@ -144,7 +149,8 @@ public class DataSeeder implements CommandLineRunner {
                     categoryRepository.save(category);
                 }
             });
-        }
+        } else
+            log.info("Categories already exist");
     }
 
     private void seedProducts() {
@@ -169,7 +175,8 @@ public class DataSeeder implements CommandLineRunner {
 
                 productRepository.save(product);
             });
-        }
+        } else
+            log.info("Products already exist");
     }
 
     private void seedPurchaseOrders() {
@@ -184,26 +191,41 @@ public class DataSeeder implements CommandLineRunner {
                 po.setOrderDate(LocalDate.now().minusDays(faker.number().numberBetween(1, 30)));
                 po.setReceiveDate(po.getOrderDate().plusDays(faker.number().numberBetween(1, 10)));
                 po.setStatus(OrderStatus.PROCESSING);
-                po.setTotalAmount(BigDecimal.ZERO);
                 po.setNotes(faker.lorem().sentence());
 
                 Set<PurchaseOrderItem> items = new HashSet<>();
+                final BigDecimal[] totalAmount = {BigDecimal.ZERO};
+                Set<Product> selectedProducts = new HashSet<>();
+
                 IntStream.range(0, faker.number().numberBetween(1, 10)).forEach(j -> {
-                    Product product = products.get(faker.random().nextInt(products.size()));
+                    Product product;
+                    do {
+                        product = products.get(random.nextInt(products.size()));
+                    } while (selectedProducts.contains(product));
+                    selectedProducts.add(product);
+
+                    int quantity = faker.number().numberBetween(1, 1000);
+                    BigDecimal unitPrice = BigDecimal.valueOf(faker.number().randomDouble(2, 10, 500));
+                    BigDecimal totalPrice = unitPrice.multiply(BigDecimal.valueOf(quantity));
+
                     PurchaseOrderItem item = new PurchaseOrderItem();
                     item.setPurchaseOrder(po);
                     item.setProduct(product);
-                    item.setQuantity(faker.number().numberBetween(1, 10));
-                    item.setUnitPrice(product.getPrice());
+                    item.setQuantity(quantity);
+                    item.setUnitPrice(unitPrice);
+                    item.setTotalPrice(totalPrice);
+                    item.setNotes(faker.lorem().sentence());
+
                     items.add(item);
+                    totalAmount[0] = totalAmount[0].add(totalPrice);
                 });
 
+                po.setTotalAmount(totalAmount[0]);
                 po.setPurchaseOrderItems(items);
-                po.setTotalAmount(items.stream().map(PurchaseOrderItem::getTotalPrice).reduce(BigDecimal.ZERO, BigDecimal::add));
-
                 purchaseOrderRepository.save(po);
             });
-        }
+        } else
+           log.info("Purchase orders already exist");
     }
 
     private void seedSalesOrders() {
@@ -212,36 +234,50 @@ public class DataSeeder implements CommandLineRunner {
             List<Product> products = productRepository.findAll();
 
             IntStream.range(0, 500).forEach(i -> {
-                SalesOrder so = new SalesOrder();
+               SalesOrder so = new SalesOrder();
                 so.setSoNumber(faker.code().isbn13());
                 so.setCustomer(customers.get(faker.random().nextInt(customers.size())));
                 so.setOrderDate(LocalDate.now().minusDays(faker.number().numberBetween(1, 30)));
                 so.setExpectedShipmentDate(so.getOrderDate().plusDays(faker.number().numberBetween(1, 10)));
                 so.setStatus(OrderStatus.PROCESSING);
-                so.setSubtotal(BigDecimal.ZERO);
-                so.setTaxAmount(BigDecimal.ZERO);
-                so.setShippingCost(BigDecimal.valueOf(faker.number().randomDouble(2, 5, 50)));
-                so.setDiscount(BigDecimal.ZERO);
-                so.setTotalAmount(BigDecimal.ZERO);
                 so.setNotes(faker.lorem().sentence());
+                so.setDiscount(BigDecimal.valueOf(faker.number().numberBetween(1, 100)));
+                so.setShippingCost(BigDecimal.valueOf(faker.number().numberBetween(1, 100)));
+                so.setTaxAmount(BigDecimal.valueOf(faker.number().numberBetween(1, 100)));
 
                 Set<SalesOrderItem> items = new HashSet<>();
+                final BigDecimal[] subTotal = {BigDecimal.ZERO};
+                Set<Product> selectedProducts = new HashSet<>();
+
                 IntStream.range(0, faker.number().numberBetween(1, 10)).forEach(j -> {
-                    Product product = products.get(faker.random().nextInt(products.size()));
+                    Product product;
+                    do {
+                        product = products.get(random.nextInt(products.size()));
+                    } while (selectedProducts.contains(product));
+                    selectedProducts.add(product);
+
+                    int quantity = faker.number().numberBetween(1, 1000);
+                    BigDecimal unitPrice = BigDecimal.valueOf(faker.number().randomDouble(2, 10, 500));
+                    BigDecimal totalPrice = unitPrice.multiply(BigDecimal.valueOf(quantity));
+
                     SalesOrderItem item = new SalesOrderItem();
                     item.setSalesOrder(so);
                     item.setProduct(product);
-                    item.setQuantity(faker.number().numberBetween(1, 10));
-                    item.setUnitPrice(product.getPrice());
+                    item.setQuantity(quantity);
+                    item.setUnitPrice(unitPrice);
+                    item.setTotalPrice(totalPrice);
+                    item.setNotes(faker.lorem().sentence());
                     items.add(item);
-                });
 
+                    subTotal[0] = subTotal[0].add(totalPrice);
+                });
+                so.setSubtotal(subTotal[0]);
                 so.setSalesOrderItems(items);
-                so.setSubtotal(items.stream().map(SalesOrderItem::getTotalPrice).reduce(BigDecimal.ZERO, BigDecimal::add));
-                so.setTotalAmount(so.getSubtotal().add(so.getTaxAmount()).add(so.getShippingCost()).subtract(so.getDiscount()));
+                so.setTotalAmount(subTotal[0].add(so.getShippingCost()).add(so.getTaxAmount()).subtract(so.getDiscount()));
 
                 salesOrderRepository.save(so);
             });
-        }
+        } else
+            log.info("Sales orders already exist");
     }
 }

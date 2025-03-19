@@ -49,6 +49,6 @@ public class SalesOrder extends AuditEntity {
 
     private String notes;
 
-    @OneToMany(mappedBy = "salesOrder")
+    @OneToMany(mappedBy = "salesOrder", cascade = CascadeType.ALL)
     private Set<SalesOrderItem> salesOrderItems;
 }

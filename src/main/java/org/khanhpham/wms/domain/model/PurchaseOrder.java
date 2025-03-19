@@ -7,6 +7,7 @@ import org.khanhpham.wms.common.OrderStatus;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.Set;
 
 @Getter
@@ -45,3 +46,4 @@ public class PurchaseOrder extends AuditEntity {
     @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL)
     private Set<PurchaseOrderItem> purchaseOrderItems;
 }
+

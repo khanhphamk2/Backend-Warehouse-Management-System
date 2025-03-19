@@ -10,7 +10,9 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "purchase_order_items")
+@Table(name = "purchase_order_items", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"product_id", "purchase_order_id"})
+})
 @Builder
 public class PurchaseOrderItem extends AuditEntity {
     @Id
@@ -21,7 +23,7 @@ public class PurchaseOrderItem extends AuditEntity {
     @JoinColumn(name = "purchase_order_id", nullable = false)
     private PurchaseOrder purchaseOrder;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
@@ -38,7 +40,7 @@ public class PurchaseOrderItem extends AuditEntity {
 
     @PrePersist
     @PreUpdate
-    protected void calculateTotalPrice() {
+    public void calculateTotalPrice() {
         if (unitPrice != null && quantity > 0) {
             totalPrice = unitPrice.multiply(BigDecimal.valueOf(quantity));
         } else {

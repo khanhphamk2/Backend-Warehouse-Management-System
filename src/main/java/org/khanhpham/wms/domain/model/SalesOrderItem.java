@@ -11,18 +11,20 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Entity
 @Builder
-@Table(name = "sales_order_items")
+@Table(name = "sales_order_items", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"product_id", "purchase_order_id"})
+})
 public class SalesOrderItem extends AuditEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sales_order_id")
+    @JoinColumn(name = "sales_order_id", nullable = false)
     private SalesOrder salesOrder;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
     @Column(nullable = false)
@@ -31,6 +33,7 @@ public class SalesOrderItem extends AuditEntity {
     @Column(nullable = false)
     private BigDecimal unitPrice;
 
+    @Column(nullable = false)
     private BigDecimal totalPrice;
 
     private String notes;

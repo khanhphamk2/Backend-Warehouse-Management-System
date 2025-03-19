@@ -9,6 +9,7 @@ import org.khanhpham.wms.domain.response.PaginationResponse;
 import org.khanhpham.wms.service.ProductService;
 import org.khanhpham.wms.utils.AppConstants;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;

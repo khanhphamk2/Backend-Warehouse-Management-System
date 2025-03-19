@@ -3,11 +3,10 @@ package org.khanhpham.wms.domain.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
-import java.io.Serializable;
 import java.util.List;
 
 /**
- * DTO for {@link org.khanhpham.wms.domain.model.Warehouse}
+ * DTO for {@link org.khanhpham.wms.domain.entity.Warehouse}
  */
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor

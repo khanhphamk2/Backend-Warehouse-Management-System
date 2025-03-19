@@ -1,11 +1,9 @@
 package org.khanhpham.wms.service;
 
 import org.khanhpham.wms.domain.dto.SupplierDTO;
-import org.khanhpham.wms.domain.model.Supplier;
+import org.khanhpham.wms.domain.entity.Supplier;
 import org.khanhpham.wms.domain.request.SupplierRequest;
 import org.khanhpham.wms.domain.response.PaginationResponse;
-
-import java.util.List;
 
 public interface SupplierService {
     SupplierDTO createSupplier(SupplierRequest request);

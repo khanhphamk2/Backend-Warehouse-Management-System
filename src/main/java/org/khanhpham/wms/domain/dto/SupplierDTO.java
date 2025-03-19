@@ -6,7 +6,7 @@ import lombok.*;
 import java.util.List;
 
 /**
- * DTO for {@link org.khanhpham.wms.domain.model.Supplier}
+ * DTO for {@link org.khanhpham.wms.domain.entity.Supplier}
  */
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor

@@ -1,7 +1,7 @@
 package org.khanhpham.wms.service;
 
 import org.khanhpham.wms.domain.dto.UserDTO;
-import org.khanhpham.wms.domain.model.User;
+import org.khanhpham.wms.domain.entity.User;
 import org.khanhpham.wms.domain.request.RegisterRequest;
 
 import java.util.Optional;

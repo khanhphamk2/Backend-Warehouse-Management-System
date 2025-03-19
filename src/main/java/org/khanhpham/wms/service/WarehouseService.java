@@ -1,7 +1,7 @@
 package org.khanhpham.wms.service;
 
 import org.khanhpham.wms.domain.dto.WarehouseDTO;
-import org.khanhpham.wms.domain.model.Warehouse;
+import org.khanhpham.wms.domain.entity.Warehouse;
 import org.khanhpham.wms.domain.request.WarehouseRequest;
 import org.khanhpham.wms.domain.response.PaginationResponse;
 

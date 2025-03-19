@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 /**
- * DTO for {@link org.khanhpham.wms.domain.model.Product}
+ * DTO for {@link org.khanhpham.wms.domain.entity.Product}
  */
 @EqualsAndHashCode(callSuper = true)
 @Data

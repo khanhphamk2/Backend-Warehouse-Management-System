@@ -3,11 +3,10 @@ package org.khanhpham.wms.domain.dto;
 import jakarta.validation.constraints.Email;
 import lombok.*;
 
-import java.util.List;
 import java.util.Set;
 
 /**
- * DTO for {@link org.khanhpham.wms.domain.model.Customer}
+ * DTO for {@link org.khanhpham.wms.domain.entity.Customer}
  */
 @EqualsAndHashCode(callSuper = true)
 @Data

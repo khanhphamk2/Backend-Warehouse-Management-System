@@ -1,8 +1,6 @@
-package org.khanhpham.wms.domain.model;
+package org.khanhpham.wms.domain.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 import java.util.List;

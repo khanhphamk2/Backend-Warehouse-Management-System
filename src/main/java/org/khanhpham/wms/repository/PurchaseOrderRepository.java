@@ -1,7 +1,7 @@
 package org.khanhpham.wms.repository;
 
 import org.khanhpham.wms.common.OrderStatus;
-import org.khanhpham.wms.domain.model.PurchaseOrder;
+import org.khanhpham.wms.domain.entity.PurchaseOrder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.domain.Pageable;

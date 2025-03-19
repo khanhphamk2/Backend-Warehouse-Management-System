@@ -1,13 +1,12 @@
 package org.khanhpham.wms.service.impl;
 
 import com.nimbusds.jose.*;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.khanhpham.wms.domain.dto.UserDTO;
-import org.khanhpham.wms.domain.model.InvalidatedToken;
-import org.khanhpham.wms.domain.model.User;
+import org.khanhpham.wms.domain.entity.InvalidatedToken;
+import org.khanhpham.wms.domain.entity.User;
 import org.khanhpham.wms.domain.request.*;
 import org.khanhpham.wms.domain.response.AuthResponse;
 import org.khanhpham.wms.domain.response.IntrospectResponse;
@@ -17,7 +16,6 @@ import org.khanhpham.wms.security.JwtTokenProvider;
 import org.khanhpham.wms.service.AuthService;
 import org.khanhpham.wms.service.UserService;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

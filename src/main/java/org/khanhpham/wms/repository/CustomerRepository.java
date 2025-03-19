@@ -1,10 +1,8 @@
 package org.khanhpham.wms.repository;
 
-import org.khanhpham.wms.domain.model.Customer;
+import org.khanhpham.wms.domain.entity.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.lang.NonNull;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface CustomerRepository extends JpaRepository<Customer, Long> {

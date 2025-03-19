@@ -1,8 +1,8 @@
 package org.khanhpham.wms.security;
 
 import lombok.RequiredArgsConstructor;
-import org.khanhpham.wms.domain.model.Role;
-import org.khanhpham.wms.domain.model.User;
+import org.khanhpham.wms.domain.entity.Role;
+import org.khanhpham.wms.domain.entity.User;
 import org.khanhpham.wms.repository.UserRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

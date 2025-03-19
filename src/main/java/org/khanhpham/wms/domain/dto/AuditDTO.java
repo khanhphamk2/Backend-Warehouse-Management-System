@@ -1,7 +1,7 @@
 package org.khanhpham.wms.domain.dto;
 
 import lombok.*;
-import org.khanhpham.wms.domain.model.AuditEntity;
+import org.khanhpham.wms.domain.entity.AuditEntity;
 
 import java.time.LocalDateTime;
 

@@ -3,7 +3,7 @@ package org.khanhpham.wms.service.impl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.khanhpham.wms.domain.dto.SupplierDTO;
-import org.khanhpham.wms.domain.model.Supplier;
+import org.khanhpham.wms.domain.entity.Supplier;
 import org.khanhpham.wms.domain.request.SupplierRequest;
 import org.khanhpham.wms.domain.response.PaginationResponse;
 import org.khanhpham.wms.exception.ResourceAlreadyExistException;

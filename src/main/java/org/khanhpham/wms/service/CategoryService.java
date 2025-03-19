@@ -1,7 +1,7 @@
 package org.khanhpham.wms.service;
 
 import org.khanhpham.wms.domain.dto.CategoryDTO;
-import org.khanhpham.wms.domain.model.Category;
+import org.khanhpham.wms.domain.entity.Category;
 import org.khanhpham.wms.domain.request.CategoryRequest;
 import org.khanhpham.wms.domain.response.PaginationResponse;
 

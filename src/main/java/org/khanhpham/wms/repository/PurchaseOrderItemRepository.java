@@ -1,6 +1,6 @@
 package org.khanhpham.wms.repository;
 
-import org.khanhpham.wms.domain.model.PurchaseOrderItem;
+import org.khanhpham.wms.domain.entity.PurchaseOrderItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

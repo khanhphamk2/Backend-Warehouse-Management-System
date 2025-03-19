@@ -1,4 +1,4 @@
-package org.khanhpham.wms.domain.model;
+package org.khanhpham.wms.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

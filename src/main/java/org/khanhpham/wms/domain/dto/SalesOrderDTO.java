@@ -3,13 +3,10 @@ package org.khanhpham.wms.domain.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.khanhpham.wms.common.OrderStatus;
-import org.khanhpham.wms.domain.model.SalesOrder;
+import org.khanhpham.wms.domain.entity.SalesOrder;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**

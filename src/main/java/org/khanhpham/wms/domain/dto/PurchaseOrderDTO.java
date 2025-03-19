@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * DTO for {@link org.khanhpham.wms.domain.model.PurchaseOrder}
+ * DTO for {@link org.khanhpham.wms.domain.entity.PurchaseOrder}
  */
 @EqualsAndHashCode(callSuper = true)
 @Data

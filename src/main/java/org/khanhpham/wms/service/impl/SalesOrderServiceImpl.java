@@ -5,7 +5,7 @@ import org.khanhpham.wms.common.OrderStatus;
 import org.khanhpham.wms.domain.dto.OrderItemDTO;
 import org.khanhpham.wms.domain.dto.SalesOrderDTO;
 import org.khanhpham.wms.domain.dto.ShortProductDTO;
-import org.khanhpham.wms.domain.model.*;
+import org.khanhpham.wms.domain.entity.*;
 import org.khanhpham.wms.domain.request.OrderStatusRequest;
 import org.khanhpham.wms.domain.request.SalesOrderRequest;
 import org.khanhpham.wms.domain.response.PaginationResponse;

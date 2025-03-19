@@ -2,7 +2,7 @@ package org.khanhpham.wms.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.khanhpham.wms.domain.model.Role;
+import org.khanhpham.wms.domain.entity.Role;
 import org.khanhpham.wms.domain.request.RoleRequest;
 import org.khanhpham.wms.domain.response.PaginationResponse;
 import org.khanhpham.wms.domain.response.RoleResponse;

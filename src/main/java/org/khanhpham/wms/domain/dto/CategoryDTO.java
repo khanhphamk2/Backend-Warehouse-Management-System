@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 /**
- * DTO for {@link org.khanhpham.wms.domain.model.Category}
+ * DTO for {@link org.khanhpham.wms.domain.entity.Category}
  */
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor

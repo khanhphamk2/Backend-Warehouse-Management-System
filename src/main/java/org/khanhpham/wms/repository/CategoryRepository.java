@@ -1,6 +1,6 @@
 package org.khanhpham.wms.repository;
 
-import org.khanhpham.wms.domain.model.Category;
+import org.khanhpham.wms.domain.entity.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

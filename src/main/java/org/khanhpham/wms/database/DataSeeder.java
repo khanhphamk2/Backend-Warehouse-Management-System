@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datafaker.Faker;
 import org.khanhpham.wms.common.OrderStatus;
-import org.khanhpham.wms.domain.model.*;
+import org.khanhpham.wms.domain.entity.*;
 import org.khanhpham.wms.repository.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;

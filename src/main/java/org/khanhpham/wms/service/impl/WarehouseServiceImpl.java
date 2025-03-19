@@ -2,8 +2,8 @@ package org.khanhpham.wms.service.impl;
 
 import org.apache.commons.lang3.StringUtils;
 import org.khanhpham.wms.domain.dto.WarehouseDTO;
-import org.khanhpham.wms.domain.model.User;
-import org.khanhpham.wms.domain.model.Warehouse;
+import org.khanhpham.wms.domain.entity.User;
+import org.khanhpham.wms.domain.entity.Warehouse;
 import org.khanhpham.wms.domain.request.WarehouseRequest;
 import org.khanhpham.wms.domain.response.PaginationResponse;
 import org.khanhpham.wms.exception.ResourceAlreadyExistException;
@@ -17,9 +17,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class WarehouseServiceImpl implements WarehouseService {

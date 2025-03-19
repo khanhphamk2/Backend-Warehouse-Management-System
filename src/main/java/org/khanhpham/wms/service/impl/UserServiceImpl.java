@@ -3,7 +3,7 @@ package org.khanhpham.wms.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.service.spi.ServiceException;
 import org.khanhpham.wms.domain.dto.UserDTO;
-import org.khanhpham.wms.domain.model.User;
+import org.khanhpham.wms.domain.entity.User;
 import org.khanhpham.wms.domain.request.RegisterRequest;
 import org.khanhpham.wms.exception.ResourceAlreadyExistException;
 import org.khanhpham.wms.exception.ResourceNotFoundException;

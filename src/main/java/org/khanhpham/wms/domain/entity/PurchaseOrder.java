@@ -1,4 +1,4 @@
-package org.khanhpham.wms.domain.model;
+package org.khanhpham.wms.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -6,7 +6,6 @@ import org.khanhpham.wms.common.OrderStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -15,40 +14,34 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Builder
-@Table(name = "sales_orders")
-public class SalesOrder extends AuditEntity {
+@Table(name = "purchase_orders")
+public class PurchaseOrder extends AuditEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true, nullable = false)
-    private String soNumber;
+    private String poNumber;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
+    @ManyToOne
+    @JoinColumn(name = "supplier_id")
+    private Supplier supplier;
 
     @Column(nullable = false)
     private LocalDate orderDate;
 
-    private LocalDate expectedShipmentDate;
+    @Column(nullable = false)
+    private LocalDate receiveDate;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
-
-    private BigDecimal subtotal;
-
-    private BigDecimal taxAmount;
-
-    private BigDecimal shippingCost;
-
-    private BigDecimal discount;
 
     @Column(name = "total_amount", nullable = false)
     private BigDecimal totalAmount;
 
     private String notes;
 
-    @OneToMany(mappedBy = "salesOrder", cascade = CascadeType.ALL)
-    private Set<SalesOrderItem> salesOrderItems;
+    @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL)
+    private Set<PurchaseOrderItem> purchaseOrderItems;
 }
+

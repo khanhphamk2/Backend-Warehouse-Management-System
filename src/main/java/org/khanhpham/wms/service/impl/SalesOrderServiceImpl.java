@@ -1,22 +1,22 @@
 package org.khanhpham.wms.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 import org.khanhpham.wms.common.OrderStatus;
 import org.khanhpham.wms.domain.dto.OrderItemDTO;
 import org.khanhpham.wms.domain.dto.SalesOrderDTO;
-import org.khanhpham.wms.domain.dto.ShortProductDTO;
 import org.khanhpham.wms.domain.entity.*;
+import org.khanhpham.wms.domain.mapper.SalesOrderMapper;
 import org.khanhpham.wms.domain.request.OrderStatusRequest;
 import org.khanhpham.wms.domain.request.SalesOrderRequest;
 import org.khanhpham.wms.domain.response.PaginationResponse;
 import org.khanhpham.wms.exception.ResourceNotFoundException;
 import org.khanhpham.wms.repository.SalesOrderRepository;
-import org.khanhpham.wms.service.CustomerService;
 import org.khanhpham.wms.service.ProductService;
 import org.khanhpham.wms.service.SalesOrderService;
 import org.khanhpham.wms.utils.PaginationUtils;
 import org.khanhpham.wms.utils.TrackingNumberGenerator;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,8 +30,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class SalesOrderServiceImpl implements SalesOrderService {
     private final SalesOrderRepository salesOrderRepository;
-    private final ModelMapper modelMapper;
-    private final CustomerService customerService;
+    private final SalesOrderMapper soMapper;
     private final ProductService productService;
 
     private static final Map<OrderStatus, Set<OrderStatus>> VALID_TRANSITIONS = initializeValidTransitions();
@@ -45,7 +44,7 @@ public class SalesOrderServiceImpl implements SalesOrderService {
 
         List<SalesOrderDTO> salesOrderDTOS = salesOrders.getContent()
                 .stream()
-                .map(this::convertToDTO)
+                .map(soMapper::convertToDTO)
                 .toList();
 
         return PaginationUtils.createPaginationResponse(salesOrderDTOS, salesOrders);
@@ -61,7 +60,7 @@ public class SalesOrderServiceImpl implements SalesOrderService {
 
         List<SalesOrderDTO> salesOrderDTOS = salesOrders.getContent()
                 .stream()
-                .map(this::convertToDTO)
+                .map(soMapper::convertToDTO)
                 .toList();
 
         return PaginationUtils.createPaginationResponse(salesOrderDTOS, salesOrders);
@@ -79,7 +78,7 @@ public class SalesOrderServiceImpl implements SalesOrderService {
 
         List<SalesOrderDTO> salesOrderDTOS = salesOrders.getContent()
                 .stream()
-                .map(this::convertToDTO)
+                .map(soMapper::convertToDTO)
                 .toList();
 
         return PaginationUtils.createPaginationResponse(salesOrderDTOS, salesOrders);
@@ -100,15 +99,15 @@ public class SalesOrderServiceImpl implements SalesOrderService {
 
             order.setStatus(newStatus);
 
-            return convertToDTO(salesOrderRepository.save(order));
+            return soMapper.convertToDTO(salesOrderRepository.save(order));
         }
 
-        return convertToDTO(order);
+        return soMapper.convertToDTO(order);
     }
 
     @Override
     public SalesOrderDTO getSalesOrder(Long id) {
-        return convertToDTO(findById(id));
+        return soMapper.convertToDTO(findById(id));
     }
 
     @Override
@@ -121,7 +120,7 @@ public class SalesOrderServiceImpl implements SalesOrderService {
 
         List<SalesOrderDTO> salesOrderDTOS = salesOrders.getContent()
                 .stream()
-                .map(this::convertToDTO)
+                .map(soMapper::convertToDTO)
                 .toList();
 
         return PaginationUtils.createPaginationResponse(salesOrderDTOS, salesOrders);
@@ -133,53 +132,15 @@ public class SalesOrderServiceImpl implements SalesOrderService {
         salesOrder.setTotalAmount(calculateTotalFromItems(request.getProducts()));
         updateProductQuantity(salesOrder);
 
-        return convertToDTO(salesOrder);
-    }
-
-    private SalesOrderDTO convertToDTO(SalesOrder salesOrder) {
-        SalesOrderDTO salesOrderDTO = modelMapper.map(salesOrder, SalesOrderDTO.class);
-
-        var salesOrderItems = salesOrder.getSalesOrderItems();
-
-        if (salesOrderItems != null && !salesOrderItems.isEmpty()) {
-            List<ShortProductDTO> items = salesOrderItems.stream()
-                    .map(item -> {
-                        var product = item.getProduct();
-                        return modelMapper.map(product, ShortProductDTO.class);
-                    })
-                    .toList();
-
-            salesOrderDTO.setProducts(items);
-        } else {
-            salesOrderDTO.setProducts(Collections.emptyList());
-        }
-
-        return salesOrderDTO;
-    }
-
-    private SalesOrder convertToEntity(SalesOrderRequest request) {
-        Customer customer = customerService.findById(request.getCustomerId());
-
-        return SalesOrder.builder()
-                .customer(customer)
-                .orderDate(request.getOrderDate())
-                .expectedShipmentDate(request.getExpectedShipmentDate())
-                .status(OrderStatus.PROCESSING)
-                .subtotal(request.getSubtotal())
-                .shippingCost(request.getShippingCost())
-                .taxAmount(request.getTaxAmount())
-                .discount(request.getDiscount())
-                .totalAmount(BigDecimal.ZERO)
-                .notes(!request.getNotes().isBlank() ? request.getNotes() : "")
-                .build();
+        return soMapper.convertToDTO(salesOrder);
     }
 
     private SalesOrder findById(Long id) {
         return salesOrderRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Sales Order", "id", id));
     }
 
-    private SalesOrder createSalesOrder(SalesOrderRequest request) {
-        SalesOrder salesOrder = convertToEntity(request);
+    private @NotNull SalesOrder createSalesOrder(SalesOrderRequest request) {
+        SalesOrder salesOrder = soMapper.convertToEntity(request);
 
         salesOrder.setSoNumber(TrackingNumberGenerator.generateSalesOrderNumber());
 
@@ -190,8 +151,8 @@ public class SalesOrderServiceImpl implements SalesOrderService {
         return salesOrderRepository.save(salesOrder);
     }
 
-    private Set<SalesOrderItem> createSalesOrderItems(SalesOrder salesOrder,
-                                                      List<OrderItemDTO> products) {
+    private @NotNull Set<SalesOrderItem> createSalesOrderItems(SalesOrder salesOrder,
+                                                               @NotNull List<OrderItemDTO> products) {
         Set<SalesOrderItem> salesOrderItems = new HashSet<>();
         for (OrderItemDTO item : products) {
             Product product = productService.findById(item.getProductId());
@@ -209,7 +170,7 @@ public class SalesOrderServiceImpl implements SalesOrderService {
         return salesOrderItems;
     }
 
-    private void updateProductQuantity(SalesOrder salesOrder) {
+    private void updateProductQuantity(@NotNull SalesOrder salesOrder) {
         for (SalesOrderItem item : salesOrder.getSalesOrderItems()) {
             Product product = item.getProduct();
             product.setQuantity(product.getQuantity() + item.getQuantity());
@@ -217,7 +178,7 @@ public class SalesOrderServiceImpl implements SalesOrderService {
         }
     }
 
-    private BigDecimal calculateTotalFromItems(List<OrderItemDTO> items) {
+    private BigDecimal calculateTotalFromItems(@NotNull List<OrderItemDTO> items) {
         return items.stream()
                 .map(item -> item.getUnitPrice()
                         .multiply(BigDecimal.valueOf(item.getQuantity())))
@@ -225,7 +186,7 @@ public class SalesOrderServiceImpl implements SalesOrderService {
     }
 
 
-    private static Map<OrderStatus, Set<OrderStatus>> initializeValidTransitions() {
+    private static @NotNull @UnmodifiableView Map<OrderStatus, Set<OrderStatus>> initializeValidTransitions() {
         Map<OrderStatus, Set<OrderStatus>> transitions = new EnumMap<>(OrderStatus.class);
 
         transitions.put(OrderStatus.PROCESSING, EnumSet.of(OrderStatus.SHIPPED, OrderStatus.CANCELLED));

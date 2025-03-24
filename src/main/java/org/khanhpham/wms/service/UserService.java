@@ -3,6 +3,7 @@ package org.khanhpham.wms.service;
 import org.khanhpham.wms.domain.dto.UserDTO;
 import org.khanhpham.wms.domain.entity.User;
 import org.khanhpham.wms.domain.request.RegisterRequest;
+import org.khanhpham.wms.domain.response.PaginationResponse;
 
 import java.util.Optional;
 
@@ -16,4 +17,6 @@ public interface UserService {
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
     boolean existsByUsernameOrEmail(String identity);
+    User getUserById(Long id);
+    PaginationResponse<UserDTO> getAllUsers(int pageNumber, int pageSize, String sortBy, String sortDir);
 }

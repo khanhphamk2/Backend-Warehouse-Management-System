@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.io.Serializable;
+
 /**
  * DTO for {@link org.khanhpham.wms.domain.entity.Category}
  */
@@ -11,7 +13,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class CategoryDTO extends AuditDTO {
+public class CategoryDTO extends AuditDTO implements Serializable {
     Long id;
 
     @NotBlank(message = "Name is mandatory")

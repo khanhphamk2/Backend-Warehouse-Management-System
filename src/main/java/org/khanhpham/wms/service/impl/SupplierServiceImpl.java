@@ -1,9 +1,11 @@
 package org.khanhpham.wms.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.khanhpham.wms.domain.dto.SupplierDTO;
 import org.khanhpham.wms.domain.entity.Supplier;
+import org.khanhpham.wms.domain.mapper.SupplierMapper;
 import org.khanhpham.wms.domain.request.SupplierRequest;
 import org.khanhpham.wms.domain.response.PaginationResponse;
 import org.khanhpham.wms.exception.ResourceAlreadyExistException;
@@ -11,49 +13,29 @@ import org.khanhpham.wms.exception.ResourceNotFoundException;
 import org.khanhpham.wms.repository.SupplierRepository;
 import org.khanhpham.wms.service.SupplierService;
 import org.khanhpham.wms.utils.PaginationUtils;
-import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class SupplierServiceImpl implements SupplierService {
     private static final String SUPPLIER = "Supplier";
     private final SupplierRepository supplierRepository;
-    private final ModelMapper modelMapper;
+    private final SupplierMapper supplierMapper;
 
-    public SupplierServiceImpl(SupplierRepository supplierRepository, ModelMapper modelMapper) {
-        this.supplierRepository = supplierRepository;
-        this.modelMapper = modelMapper;
-    }
 
-    private SupplierDTO convertToDTO(Supplier supplier) {
-        return modelMapper.map(supplier, SupplierDTO.class);
-    }
-
-    private Supplier convertToEntity(SupplierRequest request) {
-        return Supplier.builder()
-                .name(StringUtils.trim(request.getName()))
-                .contactInfo(StringUtils.trim(request.getContactInfo()))
-                .address(StringUtils.trim(request.getAddress()))
-                .phone(StringUtils.trim(request.getPhone()))
-                .email(StringUtils.trim(request.getEmail()))
-                .description(StringUtils.trim(request.getDescription()))
-                .purchaseOrders(new ArrayList<>())
-                .build();
-    }
 
     @Override
     public SupplierDTO createSupplier(SupplierRequest request) {
-        Supplier supplier = convertToEntity(request);
+        Supplier supplier = supplierMapper.convertToEntity(request);
         try {
             Supplier savedSupplier = supplierRepository.save(supplier);
-            return convertToDTO(savedSupplier);
+            return supplierMapper.convertToDTO(savedSupplier);
         } catch (DataIntegrityViolationException ex) {
             log.error("Error occurred while saving supplier: {}", ex.getMessage(), ex);
             throw new ResourceAlreadyExistException(SUPPLIER, "name", request.getName());
@@ -73,7 +55,7 @@ public class SupplierServiceImpl implements SupplierService {
             supplier.setName(Optional.ofNullable(request.getName()).map(StringUtils::trim).orElse(null));
             supplier.setPhone(Optional.ofNullable(request.getPhone()).map(StringUtils::trim).orElse(null));
 
-            return convertToDTO(supplierRepository.save(supplier));
+            return supplierMapper.convertToDTO(supplierRepository.save(supplier));
         } catch (RuntimeException ex) {
             throw new RuntimeException("Error occurred while updating supplier: " + ex.getMessage());
         }
@@ -82,7 +64,7 @@ public class SupplierServiceImpl implements SupplierService {
     @Override
     public SupplierDTO getSupplier(Long id) {
         return supplierRepository.findById(id)
-                .map(this::convertToDTO)
+                .map(supplierMapper::convertToDTO)
                 .orElseThrow(() -> new ResourceNotFoundException(SUPPLIER, "id", id));
     }
 
@@ -100,7 +82,7 @@ public class SupplierServiceImpl implements SupplierService {
         );
         List<SupplierDTO> content = suppliers.getContent()
                 .stream()
-                .map(this::convertToDTO)
+                .map(supplierMapper::convertToDTO)
                 .toList();
         return PaginationUtils.createPaginationResponse(content, suppliers);
     }

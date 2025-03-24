@@ -33,7 +33,7 @@ public class User extends AuditEntity {
     private String phone;
 
     @Column(name = "is_active", nullable = false)
-    private boolean isActive = true;
+    private boolean isActive;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = "users_roles",

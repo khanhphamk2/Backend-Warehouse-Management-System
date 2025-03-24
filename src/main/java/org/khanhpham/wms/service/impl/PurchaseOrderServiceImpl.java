@@ -3,24 +3,23 @@ package org.khanhpham.wms.service.impl;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 import org.khanhpham.wms.common.OrderStatus;
 import org.khanhpham.wms.domain.dto.OrderItemDTO;
 import org.khanhpham.wms.domain.dto.PurchaseOrderDTO;
-import org.khanhpham.wms.domain.dto.ShortProductDTO;
 import org.khanhpham.wms.domain.entity.Product;
 import org.khanhpham.wms.domain.entity.PurchaseOrder;
 import org.khanhpham.wms.domain.entity.PurchaseOrderItem;
-import org.khanhpham.wms.domain.entity.Supplier;
+import org.khanhpham.wms.domain.mapper.PurchaseOrderMapper;
 import org.khanhpham.wms.domain.request.OrderStatusRequest;
 import org.khanhpham.wms.domain.request.PurchaseOrderRequest;
 import org.khanhpham.wms.domain.response.PaginationResponse;
 import org.khanhpham.wms.repository.PurchaseOrderRepository;
 import org.khanhpham.wms.service.ProductService;
 import org.khanhpham.wms.service.PurchaseOrderService;
-import org.khanhpham.wms.service.SupplierService;
 import org.khanhpham.wms.utils.PaginationUtils;
 import org.khanhpham.wms.utils.TrackingNumberGenerator;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -34,45 +33,10 @@ import java.util.*;
 @RequiredArgsConstructor
 public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     private final PurchaseOrderRepository purchaseOrderRepository;
-    private final ModelMapper modelMapper;
+    private final PurchaseOrderMapper poMapper;
     private final ProductService productService;
-    private final SupplierService supplierService;
 
     private static final Map<OrderStatus, Set<OrderStatus>> VALID_TRANSITIONS = initializeValidTransitions();
-
-    private PurchaseOrderDTO convertToDTO(PurchaseOrder purchaseOrder) {
-        PurchaseOrderDTO purchaseOrderDTO = modelMapper.map(purchaseOrder, PurchaseOrderDTO.class);
-
-        var purchaseOrderItems = purchaseOrder.getPurchaseOrderItems();
-
-        if (purchaseOrderItems != null && !purchaseOrderItems.isEmpty()) {
-            List<ShortProductDTO> items = purchaseOrderItems.stream()
-                    .map(item -> {
-                        var product = item.getProduct();
-                        return modelMapper.map(product, ShortProductDTO.class);
-                    })
-                    .toList();
-
-            purchaseOrderDTO.setProducts(items);
-        } else {
-            purchaseOrderDTO.setProducts(Collections.emptyList());
-        }
-
-        return purchaseOrderDTO;
-    }
-
-    private PurchaseOrder convertToEntity(PurchaseOrderRequest request) {
-        Supplier supplier = supplierService.getSupplierById(request.getSupplierId());
-
-        return PurchaseOrder.builder()
-                .supplier(supplier)
-                .orderDate(request.getOrderDate())
-                .receiveDate(request.getReceiveDate())
-                .totalAmount(BigDecimal.ZERO)
-                .notes(!request.getNotes().isEmpty() ? request.getNotes() : "")
-                .status(OrderStatus.PROCESSING)
-                .build();
-    }
 
     @Override
     public PurchaseOrderDTO processPurchaseOrder(PurchaseOrderRequest request) {
@@ -80,7 +44,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         purchaseOrder.setTotalAmount(calculateTotalFromItems(request.getProducts()));
         updateProductQuantity(purchaseOrder);
 
-        return convertToDTO(purchaseOrder);
+        return poMapper.convertToDTO(purchaseOrder);
     }
 
     @Override
@@ -98,15 +62,15 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
             order.setStatus(newStatus);
 
-            return convertToDTO(purchaseOrderRepository.save(order));
+            return poMapper.convertToDTO(purchaseOrderRepository.save(order));
         }
 
-        return convertToDTO(order);
+        return poMapper.convertToDTO(order);
     }
 
     @Override
     public PurchaseOrderDTO getPurchaseOrder(Long id) {
-        return convertToDTO(findById(id));
+        return poMapper.convertToDTO(findById(id));
     }
 
     @Override
@@ -116,7 +80,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
         List<PurchaseOrderDTO> purchaseOrderDTOs = purchaseOrders.getContent()
                 .stream()
-                .map(this::convertToDTO)
+                .map(poMapper::convertToDTO)
                 .toList();
 
         return PaginationUtils.createPaginationResponse(purchaseOrderDTOs, purchaseOrders);
@@ -130,7 +94,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
         List<PurchaseOrderDTO> purchaseOrderDTOs = purchaseOrders.getContent()
                 .stream()
-                .map(this::convertToDTO)
+                .map(poMapper::convertToDTO)
                 .toList();
 
         return PaginationUtils.createPaginationResponse(purchaseOrderDTOs, purchaseOrders);
@@ -146,7 +110,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
         List<PurchaseOrderDTO> purchaseOrderDTOs = purchaseOrders.getContent()
                 .stream()
-                .map(this::convertToDTO)
+                .map(poMapper::convertToDTO)
                 .toList();
 
         return PaginationUtils.createPaginationResponse(purchaseOrderDTOs, purchaseOrders);
@@ -161,7 +125,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
 
         List<PurchaseOrderDTO> purchaseOrderDTOs = purchaseOrders.getContent()
                 .stream()
-                .map(this::convertToDTO)
+                .map(poMapper::convertToDTO)
                 .toList();
 
         return PaginationUtils.createPaginationResponse(purchaseOrderDTOs, purchaseOrders);
@@ -172,8 +136,8 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
                 .orElseThrow(() -> new EntityNotFoundException("Purchase order not found with id: " + id));
     }
 
-    private PurchaseOrder createPurchaseOrder(PurchaseOrderRequest request) {
-        PurchaseOrder purchaseOrder = convertToEntity(request);
+    private @NotNull PurchaseOrder createPurchaseOrder(PurchaseOrderRequest request) {
+        PurchaseOrder purchaseOrder = poMapper.convertToEntity(request);
 
         purchaseOrder.setPoNumber(TrackingNumberGenerator.generatePurchaseOrderNumber());
 
@@ -184,8 +148,8 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         return purchaseOrderRepository.save(purchaseOrder);
     }
 
-    private Set<PurchaseOrderItem> createPurchaseOrderItems(PurchaseOrder purchaseOrder,
-                                                            List<OrderItemDTO> products) {
+    private @NotNull Set<PurchaseOrderItem> createPurchaseOrderItems(PurchaseOrder purchaseOrder,
+                                                                     @NotNull List<OrderItemDTO> products) {
         Set<PurchaseOrderItem> purchaseOrderItems = new HashSet<>();
         for (OrderItemDTO item : products) {
             Product product = productService.findById(item.getProductId());
@@ -203,7 +167,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         return purchaseOrderItems;
     }
 
-    private void updateProductQuantity(PurchaseOrder purchaseOrder) {
+    private void updateProductQuantity(@NotNull PurchaseOrder purchaseOrder) {
         for (PurchaseOrderItem item : purchaseOrder.getPurchaseOrderItems()) {
             Product product = item.getProduct();
             product.setQuantity(product.getQuantity() + item.getQuantity());
@@ -211,14 +175,14 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         }
     }
 
-    private BigDecimal calculateTotalFromItems(List<OrderItemDTO> items) {
+    private BigDecimal calculateTotalFromItems(@NotNull List<OrderItemDTO> items) {
         return items.stream()
                 .map(item -> item.getUnitPrice()
                         .multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    private static Map<OrderStatus, Set<OrderStatus>> initializeValidTransitions() {
+    private static @NotNull @UnmodifiableView Map<OrderStatus, Set<OrderStatus>> initializeValidTransitions() {
         Map<OrderStatus, Set<OrderStatus>> transitions = new EnumMap<>(OrderStatus.class);
 
         transitions.put(OrderStatus.PROCESSING, EnumSet.of(OrderStatus.SHIPPED, OrderStatus.CANCELLED));

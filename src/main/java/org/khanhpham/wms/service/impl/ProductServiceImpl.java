@@ -3,19 +3,18 @@ package org.khanhpham.wms.service.impl;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.khanhpham.wms.domain.dto.ProductDTO;
 import org.khanhpham.wms.domain.entity.Category;
 import org.khanhpham.wms.domain.entity.Product;
-import org.khanhpham.wms.domain.entity.Supplier;
+import org.khanhpham.wms.domain.mapper.ProductMapper;
 import org.khanhpham.wms.domain.request.ProductRequest;
 import org.khanhpham.wms.domain.response.PaginationResponse;
 import org.khanhpham.wms.exception.ResourceAlreadyExistException;
 import org.khanhpham.wms.repository.ProductRepository;
 import org.khanhpham.wms.service.CategoryService;
 import org.khanhpham.wms.service.ProductService;
-import org.khanhpham.wms.service.SupplierService;
 import org.khanhpham.wms.utils.PaginationUtils;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -34,37 +33,15 @@ public class ProductServiceImpl implements ProductService {
     private static final String PRODUCT = "Product";
 
     private final ProductRepository productRepository;
-    private final ModelMapper modelMapper;
+    private final ProductMapper productMapper;
     private final CategoryService categoryService;
-    private final SupplierService supplierService;
-
-    private ProductDTO convertToDTO(Product product) {
-        return modelMapper.map(product, ProductDTO.class);
-    }
-
-    private Product convertToEntity(ProductRequest request) {
-        Supplier supplier = supplierService.getSupplierById(request.getSupplierId());
-        List<Category> categories = categoryService.getAllById(request.getCategoryIds());
-        return Product.builder()
-                .name(request.getName())
-                .description(request.getDescription())
-                .price(request.getPrice())
-                .sku(request.getSku())
-                .expiryDate(request.getExpiryDate())
-                .unit(request.getUnit())
-                .quantity(request.getQuantity())
-                .imageUrl(request.getImageUrl())
-                .supplier(supplier)
-                .categories(new HashSet<>(categories))
-                .build();
-    }
 
     @Override
-    public ProductDTO createProduct(ProductRequest request) {
+    public ProductDTO createProduct(@NotNull ProductRequest request) {
         if (Boolean.FALSE.equals(productRepository.existsBySku(request.getSku()))) {
-            Product product = convertToEntity(request);
+            Product product = productMapper.convertToEntity(request);
 
-            return convertToDTO(productRepository.save(product));
+            return productMapper.convertToDTO(productRepository.save(product));
         } else {
             throw new ResourceAlreadyExistException(PRODUCT, "sku", request.getSku());
         }
@@ -75,16 +52,16 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(MessageFormat.format(PRODUCT_NOT_FOUND_MESSAGE, id)));
         product.setLastModifiedDate(LocalDateTime.now());
-        modelMapper.map(request, product);
+        productMapper.map(request, product);
         mapCategories(product, request.getCategoryIds());
 
-        return convertToDTO(productRepository.save(product));
+        return productMapper.convertToDTO(productRepository.save(product));
     }
 
     @Override
     public ProductDTO getProductById(Long id) {
         return productRepository.findById(id)
-                .map(this::convertToDTO)
+                .map(productMapper::convertToDTO)
                 .orElseThrow(() -> new EntityNotFoundException(MessageFormat.format(PRODUCT_NOT_FOUND_MESSAGE, id)));
     }
 
@@ -99,14 +76,14 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDTO getProductBySku(String sku) {
         return productRepository.findBySku(sku)
-                .map(this::convertToDTO)
+                .map(productMapper::convertToDTO)
                 .orElseThrow(() -> new EntityNotFoundException(MessageFormat.format(PRODUCT_NOT_FOUND_MESSAGE, sku)));
     }
 
     @Override
     public ProductDTO getProductByName(String name) {
         return productRepository.findByName(name)
-                .map(this::convertToDTO)
+                .map(productMapper::convertToDTO)
                 .orElseThrow(() -> new EntityNotFoundException(MessageFormat.format(PRODUCT_NOT_FOUND_MESSAGE, name)));
     }
 
@@ -117,7 +94,7 @@ public class ProductServiceImpl implements ProductService {
         );
         List<ProductDTO> productDTOS = products.getContent()
                 .stream()
-                .map(this::convertToDTO)
+                .map(productMapper::convertToDTO)
                 .toList();
         return PaginationUtils.createPaginationResponse(productDTOS, products);
     }
@@ -129,7 +106,7 @@ public class ProductServiceImpl implements ProductService {
 
         List<ProductDTO> productDTOS = products.getContent()
                 .stream()
-                .map(this::convertToDTO)
+                .map(productMapper::convertToDTO)
                 .toList();
         return PaginationUtils.createPaginationResponse(productDTOS, products);
     }
@@ -141,7 +118,7 @@ public class ProductServiceImpl implements ProductService {
 
         List<ProductDTO> productDTOS = products.getContent()
                 .stream()
-                .map(this::convertToDTO)
+                .map(productMapper::convertToDTO)
                 .toList();
         return PaginationUtils.createPaginationResponse(productDTOS, products);
     }
@@ -153,7 +130,7 @@ public class ProductServiceImpl implements ProductService {
 
         List<ProductDTO> productDTOS = products.getContent()
                 .stream()
-                .map(this::convertToDTO)
+                .map(productMapper::convertToDTO)
                 .toList();
 
         return PaginationUtils.createPaginationResponse(productDTOS, products);
@@ -166,7 +143,7 @@ public class ProductServiceImpl implements ProductService {
 
         List<ProductDTO> productDTOS = products.getContent()
                 .stream()
-                .map(this::convertToDTO)
+                .map(productMapper::convertToDTO)
                 .toList();
 
         return PaginationUtils.createPaginationResponse(productDTOS, products);

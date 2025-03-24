@@ -45,7 +45,7 @@ public class SecurityConfig  {
     private static final String SALES_ORDER_API = "/api/v1/sales-orders/**";
 
     @Value("${app.jwt.singer-key}")
-    private String base64EncodedSingerKey;
+    private String singerKey;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -80,7 +80,6 @@ public class SecurityConfig  {
                                 AntPathRequestMatcher.antMatcher(HttpMethod.POST, WAREHOUSE_API),
                                 AntPathRequestMatcher.antMatcher(HttpMethod.PUT, WAREHOUSE_API)
                         ).hasAnyAuthority(ROLE_ADMIN, ROLE_MODERATOR)
-
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
@@ -108,8 +107,7 @@ public class SecurityConfig  {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        byte[] decodedKey = Base64.getDecoder().decode(base64EncodedSingerKey);
-        SecretKeySpec secretKeySpec = new SecretKeySpec(decodedKey, "HmacSHA512");
+        SecretKeySpec secretKeySpec = new SecretKeySpec(singerKey.getBytes(), "HmacSHA512");
         return NimbusJwtDecoder
                 .withSecretKey(secretKeySpec)
                 .macAlgorithm(MacAlgorithm.HS512)
@@ -119,7 +117,8 @@ public class SecurityConfig  {
     @Bean
     JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
+        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+        jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName("scope");
 
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);

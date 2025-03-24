@@ -3,6 +3,7 @@ package org.khanhpham.wms.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.khanhpham.wms.domain.entity.Role;
+import org.khanhpham.wms.domain.mapper.RoleMapper;
 import org.khanhpham.wms.domain.request.RoleRequest;
 import org.khanhpham.wms.domain.response.PaginationResponse;
 import org.khanhpham.wms.domain.response.RoleResponse;
@@ -21,15 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RoleServiceImpl implements RoleService {
     private final RoleRepository roleRepository;
-    private final ModelMapper modelMapper;
-
-    private RoleResponse convertToResponse(Role role) {
-        return modelMapper.map(role, RoleResponse.class);
-    }
-
-    private Role convertToEntity(RoleRequest role) {
-        return modelMapper.map(role, Role.class);
-    }
+    private final RoleMapper roleMapper;
 
     @Override
     public PaginationResponse<RoleResponse> getAll(int pageNumber, int pageSize, String sortBy, String sortDir) {
@@ -39,7 +32,7 @@ public class RoleServiceImpl implements RoleService {
 
         List<RoleResponse> content = roles.getContent()
                 .stream()
-                .map(this::convertToResponse)
+                .map(roleMapper::convertToResponse)
                 .toList();
 
         return PaginationUtils.createPaginationResponse(content, roles);
@@ -48,14 +41,14 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public RoleResponse getRole(Long id) {
         return roleRepository.findById(id)
-                .map(this::convertToResponse)
+                .map(roleMapper::convertToResponse)
                 .orElseThrow(()-> new ResourceNotFoundException("Role", "id", id));
     }
 
     @Override
     public RoleResponse createRole(RoleRequest role) {
-        Role newRole = roleRepository.save(convertToEntity(role));
-        return convertToResponse(newRole);
+        Role newRole = roleRepository.save(roleMapper.convertToEntity(role));
+        return roleMapper.convertToResponse(newRole);
     }
 
     @Override

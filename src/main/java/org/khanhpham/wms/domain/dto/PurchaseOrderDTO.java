@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.khanhpham.wms.common.OrderStatus;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PurchaseOrderDTO extends AuditDTO {
+public class PurchaseOrderDTO extends AuditDTO implements Serializable {
     Long id;
     Long supplierId;
     LocalDate orderDate;

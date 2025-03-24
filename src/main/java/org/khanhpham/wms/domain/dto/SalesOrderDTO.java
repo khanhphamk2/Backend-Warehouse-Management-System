@@ -5,6 +5,7 @@ import lombok.*;
 import org.khanhpham.wms.common.OrderStatus;
 import org.khanhpham.wms.domain.entity.SalesOrder;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SalesOrderDTO extends AuditDTO {
+public class SalesOrderDTO extends AuditDTO implements Serializable {
     private Long id;
     private Long customerId;
     private LocalDate orderDate;

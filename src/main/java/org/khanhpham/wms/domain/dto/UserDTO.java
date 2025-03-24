@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.khanhpham.wms.domain.response.RoleResponse;
 
+import java.io.Serializable;
 import java.util.Set;
 
 /**
@@ -14,7 +15,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class UserDTO extends AuditDTO {
+public class UserDTO extends AuditDTO implements Serializable {
     Long id;
     String username;
     String name;

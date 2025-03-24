@@ -1,8 +1,10 @@
 package org.khanhpham.wms.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.khanhpham.wms.domain.dto.CategoryDTO;
 import org.khanhpham.wms.domain.entity.Category;
+import org.khanhpham.wms.domain.mapper.CategoryMapper;
 import org.khanhpham.wms.domain.request.CategoryRequest;
 import org.khanhpham.wms.domain.response.PaginationResponse;
 import org.khanhpham.wms.exception.ResourceAlreadyExistException;
@@ -10,7 +12,6 @@ import org.khanhpham.wms.exception.ResourceNotFoundException;
 import org.khanhpham.wms.repository.CategoryRepository;
 import org.khanhpham.wms.service.CategoryService;
 import org.khanhpham.wms.utils.PaginationUtils;
-import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -20,34 +21,19 @@ import java.util.Set;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
     private static final String CATEGORY = "Category";
     private final CategoryRepository categoryRepository;
-    private final ModelMapper modelMapper;
-
-    public CategoryServiceImpl(CategoryRepository categoryRepository, ModelMapper modelMapper) {
-        this.categoryRepository = categoryRepository;
-        this.modelMapper = modelMapper;
-    }
-
-    private CategoryDTO convertToDTO(Category category) {
-        return modelMapper.map(category, CategoryDTO.class);
-    }
-
-    private Category convertToEntity(CategoryRequest categoryRequest) {
-        return Category.builder()
-                .name(categoryRequest.getName())
-                .description(categoryRequest.getDescription())
-                .build();
-    }
+    private final CategoryMapper categoryMapper;
 
     @Override
     public CategoryDTO createCategory(CategoryRequest categoryRequest) {
-        Category category = convertToEntity(categoryRequest);
         try {
-            Category savedCategory = categoryRepository.save(category);
-            return convertToDTO(savedCategory);
-        } catch (DataIntegrityViolationException ex) {
+            Category category = categoryMapper.convertToEntity(categoryRequest);
+            return categoryMapper.convertToDTO(categoryRepository.save(category));
+        } catch (DataIntegrityViolationException e) {
+            log.error("Category already exists: {}", categoryRequest.getName());
             throw new ResourceAlreadyExistException(CATEGORY, "name", categoryRequest.getName());
         }
     }
@@ -58,7 +44,7 @@ public class CategoryServiceImpl implements CategoryService {
                 .orElseThrow(() -> new ResourceNotFoundException(CATEGORY, "id", id));
         category.setName(categoryRequest.getName());
         category.setDescription(categoryRequest.getDescription());
-        return convertToDTO(categoryRepository.save(category));
+        return categoryMapper.convertToDTO(categoryRepository.save(category));
     }
 
     @Override
@@ -71,14 +57,14 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDTO getCategoryById(Long id) {
         return categoryRepository.findById(id)
-                .map(this::convertToDTO)
+                .map(categoryMapper::convertToDTO)
                 .orElseThrow(() -> new ResourceNotFoundException(CATEGORY, "id", id));
     }
 
     @Override
     public CategoryDTO getCategoryByName(String name) {
         return categoryRepository.findByName(name)
-                .map(this::convertToDTO)
+                .map(categoryMapper::convertToDTO)
                 .orElseThrow(() -> new ResourceNotFoundException(CATEGORY, "name", name));
     }
 
@@ -90,7 +76,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         List<CategoryDTO> content = categories.getContent()
                 .stream()
-                .map(this::convertToDTO)
+                .map(categoryMapper::convertToDTO)
                 .toList();
 
         return PaginationUtils.createPaginationResponse(content, categories);

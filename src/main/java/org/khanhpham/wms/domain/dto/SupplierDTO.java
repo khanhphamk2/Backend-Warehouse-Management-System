@@ -3,6 +3,7 @@ package org.khanhpham.wms.domain.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -13,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SupplierDTO extends AuditDTO {
+public class SupplierDTO extends AuditDTO implements Serializable {
     Long id;
     String name;
     String contactInfo;

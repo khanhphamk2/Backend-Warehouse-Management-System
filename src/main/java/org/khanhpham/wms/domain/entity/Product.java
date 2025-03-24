@@ -49,7 +49,7 @@ public class Product extends AuditEntity {
     private int quantity;
 
     @Column(nullable = false)
-    private ProductStatus status = ProductStatus.ACTIVE;
+    private ProductStatus status;
 
     @ManyToMany
     @JoinTable(

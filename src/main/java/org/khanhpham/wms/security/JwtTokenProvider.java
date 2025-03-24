@@ -84,6 +84,7 @@ public class JwtTokenProvider {
     }
 
     public SignedJWT verifyToken(String token, boolean isRefresh) throws JOSEException, ParseException {
+        log.info("Verifying token: {}", token);
         JWSVerifier verifier = new MACVerifier(signerKey.getBytes());
 
         SignedJWT signedJWT = SignedJWT.parse(token);
@@ -98,6 +99,9 @@ public class JwtTokenProvider {
                 : signedJWT.getJWTClaimsSet().getExpirationTime();
 
         var verified = signedJWT.verify(verifier);
+
+        log.info("Token verification result: {}", verified);
+        log.info("Token expiry time: {}", expiryTime);
 
         if (!verified) throw new JwtException("Invalid token signature");
         if (!expiryTime.after(new Date())) throw new JwtException("Token expired");

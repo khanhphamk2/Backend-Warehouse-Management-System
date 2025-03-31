@@ -1,6 +1,7 @@
 package org.khanhpham.wms.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.khanhpham.wms.domain.dto.CustomerDTO;
 import org.khanhpham.wms.domain.entity.Customer;
 import org.khanhpham.wms.domain.mapper.CustomerMapper;
@@ -12,17 +13,26 @@ import org.khanhpham.wms.service.CustomerService;
 import org.khanhpham.wms.utils.PaginationUtils;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
     private static final String CUSTOMER = "Customer";
+    private static final String REDIS_PREFIX_ID = "customer:id:";
+    private static final String REDIS_PREFIX_NAME = "customer:name:";
+    private static final String REDIS_PREFIX_PAGE = "customer:page:";
+
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
     public CustomerDTO findByIdentity(String identity) {
@@ -40,6 +50,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    @Transactional
     public CustomerDTO createCustomer(CustomerRequest customerRequest) {
         Customer customer = customerMapper.convertToEntity(customerRequest);
         try {
@@ -93,5 +104,14 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public Customer findById(Long id) {
         return customerRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(CUSTOMER, "id", id));
+    }
+
+    private void invalidatePaginationCache() {
+        Set<String> paginationKeys = redisTemplate.keys(REDIS_PREFIX_PAGE + "*");
+        if (!paginationKeys.isEmpty()) {
+            redisTemplate.delete(paginationKeys);
+        } else {
+            log.warn("No pagination cache found");
+        }
     }
 }

@@ -1,0 +1,45 @@
+services:
+  redis:
+    image: redis/redis-stack-server
+    container_name: wms-redis-stack
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+      - ./src/main/resources/wms-redis.conf:/usr/local/etc/redis/wms-redis.conf
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    command: ["redis-server", "/usr/local/etc/redis/wms-redis.conf"]
+    restart: unless-stopped
+    environment:
+      REDIS_REPLICATION_MODE: master
+      TZ: Asia/Ho_Chi_Minh
+    networks:
+      - my-network
+
+#  springboot-app:
+#    build: .
+#    container_name: wms
+#    restart: always
+#    environment:
+#      SPRING_DATASOURCE_URL: ${spring.datasource.url}
+#      SPRING_DATASOURCE_USERNAME: myuser
+#      SPRING_DATASOURCE_PASSWORD: mypassword
+#      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+#
+#      SPRING_REDIS_HOST: redis
+#      SPRING_REDIS_PORT: 6379
+#      SPRING_REDIS_PASSWORD: admin1813
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - redis
+#    networks:
+#      - my-network
+
+volumes:
+  redis_data:
+
+networks:
+  my-network:
+    driver: bridge

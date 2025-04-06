@@ -1,6 +1,7 @@
 package org.khanhpham.wms.utils;
 
 import lombok.experimental.UtilityClass;
+import org.jetbrains.annotations.NotNull;
 import org.khanhpham.wms.domain.response.PaginationResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -11,7 +12,7 @@ import java.util.List;
 
 @UtilityClass
 public class PaginationUtils {
-    public static <T> PaginationResponse<T> createPaginationResponse(List<T> content, Page<?> page) {
+    public static <T> @NotNull PaginationResponse<T> createPaginationResponse(List<T> content, @NotNull Page<?> page) {
         PaginationResponse<T> response = new PaginationResponse<>();
         response.setData(content);
         response.setLimit(page.getSize());
@@ -23,7 +24,7 @@ public class PaginationUtils {
     }
 
 
-    public static Pageable convertToPageable(int pageNumber, int pageSize, String sortBy, String sortDir) {
+    public static @NotNull Pageable convertToPageable(int pageNumber, int pageSize, String sortBy, @NotNull String sortDir) {
         int adjustedPageNumber = Math.max(pageNumber - 1, 0); // Subtract 1 from pageNumber and ensure it's not negative
         return PageRequest.of(adjustedPageNumber, pageSize,
                 Sort.by(sortDir.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy));

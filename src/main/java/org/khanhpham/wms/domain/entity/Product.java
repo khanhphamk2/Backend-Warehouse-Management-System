@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.khanhpham.wms.common.ProductStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -49,7 +48,7 @@ public class Product extends AuditEntity {
     private int quantity;
 
     @Column(nullable = false)
-    private ProductStatus status;
+    private boolean isActive;
 
     @ManyToMany
     @JoinTable(

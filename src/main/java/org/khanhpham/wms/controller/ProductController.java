@@ -92,7 +92,7 @@ public class ProductController {
             @PathVariable Long id
     ){
         productService.deleteProductById(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(
@@ -111,7 +111,9 @@ public class ProductController {
             @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
             @Parameter(description = "Sort direction: ASC or DESC", example = "ASC")
             @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir) {
-        return ResponseEntity.ok(productService.getProductsByPrice(price, pageNumber, pageSize, sortBy, sortDir));
+        return ResponseEntity.ok(
+                productService.getProductsByPrice(price, pageNumber, pageSize, sortBy, sortDir)
+        );
     }
 
     @Operation(
@@ -155,7 +157,9 @@ public class ProductController {
             @Parameter(description = "Sort direction: ASC or DESC", example = "ASC")
             @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir
     ){
-        return ResponseEntity.ok(productService.getProductsByCategoryId(categoryId, pageNumber, pageSize, sortBy, sortDir));
+        return ResponseEntity.ok(
+                productService.getProductsByCategoryId(categoryId, pageNumber, pageSize, sortBy, sortDir)
+        );
     }
 
     @Operation(
@@ -177,6 +181,22 @@ public class ProductController {
             @Parameter(description = "Sort direction: ASC or DESC", example = "ASC")
             @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir
     ){
-        return ResponseEntity.ok(productService.getProductsByPriceRange(min, max, pageNumber, pageSize, sortBy, sortDir));
+        return ResponseEntity.ok(
+                productService.getProductsByPriceRange(min, max, pageNumber, pageSize, sortBy, sortDir)
+        );
+    }
+
+    @Operation(
+            summary = "Set product status",
+            description = "API to set the status of a product."
+    )
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<ProductDTO> setProductStatus(
+            @Parameter(description = "ID of the product to be updated", example = "1")
+            @PathVariable Long id,
+            @Parameter(description = "Status of the product", example = "true")
+            @RequestParam boolean status
+    ) {
+        return ResponseEntity.ok(productService.setProductStatus(id, status));
     }
 }

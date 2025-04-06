@@ -8,8 +8,9 @@ import org.khanhpham.wms.domain.response.PaginationResponse;
 public interface SupplierService {
     SupplierDTO createSupplier(SupplierRequest request);
     SupplierDTO updateSupplier(Long id, SupplierRequest request);
-    SupplierDTO getSupplier(Long id);
+    SupplierDTO getSupplierById(Long id);
+    SupplierDTO getSupplierByName(String name);
     void deleteSupplier(Long id);
     PaginationResponse<SupplierDTO> getAllSuppliers(int pageNumber, int pageSize, String sortBy, String sortDir);
-    Supplier getSupplierById(Long id);
+    Supplier findById(Long id);
 }

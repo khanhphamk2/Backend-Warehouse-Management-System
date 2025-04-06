@@ -8,6 +8,7 @@ import com.nimbusds.jwt.SignedJWT;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.khanhpham.wms.exception.ResourceNotFoundException;
 import org.khanhpham.wms.repository.InvalidatedTokenRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,7 +32,7 @@ public class JwtTokenProvider {
     private final InvalidatedTokenRepository invalidatedTokenRepository;
 
     @NonFinal
-    @Value("${app.jwt.singer-key}")
+    @Value("${app.jwt.signer-key}")
     private String signerKey;
 
     @NonFinal
@@ -123,7 +124,7 @@ public class JwtTokenProvider {
         }
     }
 
-    private String buildScope(UserDetails user) {
+    private String buildScope(@NotNull UserDetails user) {
         StringJoiner stringJoiner = new StringJoiner(" ");
 
         if (!CollectionUtils.isEmpty(user.getAuthorities()))

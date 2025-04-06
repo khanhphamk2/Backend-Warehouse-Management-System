@@ -91,7 +91,7 @@ public class SupplierController {
     public ResponseEntity<SupplierDTO> getSupplier(
             @Parameter(description = "Id of the supplier to be retrieved", example = "1")
             @PathVariable Long id) {
-        return ResponseEntity.ok(supplierService.getSupplier(id));
+        return ResponseEntity.ok(supplierService.getSupplierById(id));
     }
 
     @Operation(
@@ -124,5 +124,16 @@ public class SupplierController {
             @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir
     ) {
         return ResponseEntity.ok(productService.getProductsBySupplierId(id, pageNumber, pageSize, sortBy, sortDir));
+    }
+
+    @Operation(
+            summary = "Get a supplier by name",
+            description = "API to get a supplier by the provided name"
+    )
+    @GetMapping("/search")
+    public ResponseEntity<SupplierDTO> getSupplierByName(
+            @Parameter(description = "Name of the supplier to be retrieved", example = "Supplier A")
+            @RequestParam String name) {
+        return ResponseEntity.ok(supplierService.getSupplierByName(name));
     }
 }

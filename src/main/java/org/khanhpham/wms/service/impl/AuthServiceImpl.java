@@ -4,6 +4,7 @@ import com.nimbusds.jose.*;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.khanhpham.wms.domain.dto.UserDTO;
 import org.khanhpham.wms.domain.entity.InvalidatedToken;
 import org.khanhpham.wms.domain.entity.User;
@@ -54,7 +55,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional(readOnly = true)
-    public AuthResponse loginWithIdentityAndPassword(LoginRequest loginRequest) {
+    public AuthResponse loginWithIdentityAndPassword(@NotNull LoginRequest loginRequest) {
         String identity = loginRequest.getIdentity();
         if (!userService.existsByUsernameOrEmail(identity)) {
             throw new CustomException(HttpStatus.UNAUTHORIZED, "Username or password is incorrect!");
@@ -73,7 +74,7 @@ public class AuthServiceImpl implements AuthService {
             var expire = jwtTokenProvider.getExpirationTime(refreshToken);
 
             // Get user details after successful authentication
-            UserDTO user = userService.findByUsernameOrEmail(identity, identity);
+            UserDTO user = userService.findByIdentity(identity);
 
             return AuthResponse.builder()
                     .user(user)
@@ -220,7 +221,7 @@ public class AuthServiceImpl implements AuthService {
     public void forgotPassword(ForgotPasswordRequest forgotPasswordRequest) {
         try {
             String email = forgotPasswordRequest.getEmail();
-            Optional<User> user = userService.findByEmail(email);
+            Optional<User> user = userService.getByEmail(email);
             if (user.isEmpty()) {
                 throw new CustomException(HttpStatus.NOT_FOUND, "User not found");
             }

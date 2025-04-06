@@ -17,4 +17,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Page<Product> findByPriceBetween(@NotNull BigDecimal min, @NotNull BigDecimal max, Pageable pageable);
     Page<Product> findByCategoriesId(Long categoryId, Pageable pageable);
     Boolean existsBySku(String sku);
+    Boolean existsByName(String name);
 }

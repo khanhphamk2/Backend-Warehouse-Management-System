@@ -7,7 +7,6 @@ import org.khanhpham.wms.domain.dto.WarehouseDTO;
 import org.khanhpham.wms.domain.entity.User;
 import org.khanhpham.wms.domain.entity.Warehouse;
 import org.khanhpham.wms.domain.request.WarehouseRequest;
-import org.khanhpham.wms.exception.ResourceNotFoundException;
 import org.khanhpham.wms.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
@@ -23,7 +22,7 @@ public class WarehouseMapper {
     }
 
     public Warehouse convertToEntity(@NotNull WarehouseRequest warehouseRequest) {
-        User manager = userService.getUserById(warehouseRequest.getManagerId());
+        User manager = userService.getUser(warehouseRequest.getManagerId());
         return Warehouse.builder()
                 .name(StringUtils.trim(warehouseRequest.getName()))
                 .address(StringUtils.trim(warehouseRequest.getAddress()))

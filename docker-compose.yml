@@ -1,21 +1,19 @@
 services:
-  redis:
+  redis-container:
     image: redis/redis-stack-server
     container_name: wms-redis-stack
+    restart: always
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
       - ./src/main/resources/wms-redis.conf:/usr/local/etc/redis/wms-redis.conf
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
     command: ["redis-server", "/usr/local/etc/redis/wms-redis.conf"]
-    restart: unless-stopped
     environment:
       REDIS_REPLICATION_MODE: master
       TZ: Asia/Ho_Chi_Minh
     networks:
-      - my-network
+      - wms-network
 
 #  springboot-app:
 #    build: .
@@ -41,5 +39,6 @@ volumes:
   redis_data:
 
 networks:
-  my-network:
+  wms-network:
     driver: bridge
+name: wms-stack

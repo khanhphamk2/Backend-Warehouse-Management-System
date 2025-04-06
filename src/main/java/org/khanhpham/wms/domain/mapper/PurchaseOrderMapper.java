@@ -44,7 +44,7 @@ public class PurchaseOrderMapper {
     }
 
     public PurchaseOrder convertToEntity(@NotNull PurchaseOrderRequest request) {
-        Supplier supplier = supplierService.getSupplierById(request.getSupplierId());
+        Supplier supplier = supplierService.findById(request.getSupplierId());
 
         return PurchaseOrder.builder()
                 .supplier(supplier)

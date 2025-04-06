@@ -2,7 +2,6 @@ package org.khanhpham.wms.domain.mapper;
 
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.khanhpham.wms.common.ProductStatus;
 import org.khanhpham.wms.domain.dto.ProductDTO;
 import org.khanhpham.wms.domain.entity.Category;
 import org.khanhpham.wms.domain.entity.Product;
@@ -28,7 +27,7 @@ public class ProductMapper {
     }
 
     public Product convertToEntity(@NotNull ProductRequest request) {
-        Supplier supplier = supplierService.getSupplierById(request.getSupplierId());
+        Supplier supplier = supplierService.findById(request.getSupplierId());
         List<Category> categories = categoryService.getAllById(request.getCategoryIds());
         return Product.builder()
                 .name(request.getName())
@@ -40,7 +39,7 @@ public class ProductMapper {
                 .quantity(request.getQuantity())
                 .imageUrl(request.getImageUrl())
                 .supplier(supplier)
-                .status(ProductStatus.ACTIVE)
+                .isActive(true)
                 .categories(new HashSet<>(categories))
                 .build();
     }

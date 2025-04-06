@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.datafaker.Faker;
 import org.khanhpham.wms.common.OrderStatus;
-import org.khanhpham.wms.common.ProductStatus;
 import org.khanhpham.wms.domain.entity.*;
 import org.khanhpham.wms.repository.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -172,7 +171,7 @@ public class DataSeeder implements CommandLineRunner {
                 product.setImageUrl(faker.internet().image());
                 product.setQuantity(faker.number().numberBetween(1, 100));
                 product.setSupplier(suppliers.get(faker.random().nextInt(suppliers.size())));
-                product.setStatus(ProductStatus.ACTIVE);
+                product.setIsActive(true);
                 Set<Category> productCategories = new HashSet<>();
                 productCategories.add(categories.get(faker.random().nextInt(categories.size())));
                 product.setCategories(productCategories);

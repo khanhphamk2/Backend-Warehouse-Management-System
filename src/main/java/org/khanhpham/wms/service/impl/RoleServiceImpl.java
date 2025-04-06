@@ -11,7 +11,6 @@ import org.khanhpham.wms.exception.ResourceNotFoundException;
 import org.khanhpham.wms.repository.RoleRepository;
 import org.khanhpham.wms.service.RoleService;
 import org.khanhpham.wms.utils.PaginationUtils;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 

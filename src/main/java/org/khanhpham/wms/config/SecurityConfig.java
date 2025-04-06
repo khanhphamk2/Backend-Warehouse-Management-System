@@ -25,7 +25,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import javax.crypto.spec.SecretKeySpec;
-import java.util.Base64;
 
 @Configuration
 @EnableWebSecurity
@@ -33,7 +32,7 @@ import java.util.Base64;
 public class SecurityConfig  {
     private final JwtAuthenticationEntryPoint authenticationEntryPoint;
     private static final String ROLE_ADMIN = UserRole.ROLE_ADMIN.name();
-    private static final String ROLE_MODERATOR = UserRole.ROLE_MODERATOR.name();
+    private static final String ROLE_MANAGER = UserRole.ROLE_MANAGER.name();
 
     private static final String USER_API = "/api/v1/users/**";
     private static final String PRODUCT_API = "/api/v1/products/**";
@@ -44,8 +43,8 @@ public class SecurityConfig  {
     private static final String PURCHASE_ORDER_API = "/api/v1/purchase-orders/**";
     private static final String SALES_ORDER_API = "/api/v1/sales-orders/**";
 
-    @Value("${app.jwt.singer-key}")
-    private String singerKey;
+    @Value("${app.jwt.signer-key}")
+    private String signerKey;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -79,7 +78,7 @@ public class SecurityConfig  {
                                 AntPathRequestMatcher.antMatcher(HttpMethod.PUT, CUSTOMER_API),
                                 AntPathRequestMatcher.antMatcher(HttpMethod.POST, WAREHOUSE_API),
                                 AntPathRequestMatcher.antMatcher(HttpMethod.PUT, WAREHOUSE_API)
-                        ).hasAnyAuthority(ROLE_ADMIN, ROLE_MODERATOR)
+                        ).hasAnyAuthority(ROLE_ADMIN, ROLE_MANAGER)
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
@@ -107,7 +106,7 @@ public class SecurityConfig  {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        SecretKeySpec secretKeySpec = new SecretKeySpec(singerKey.getBytes(), "HmacSHA512");
+        SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(), "HmacSHA512");
         return NimbusJwtDecoder
                 .withSecretKey(secretKeySpec)
                 .macAlgorithm(MacAlgorithm.HS512)
@@ -117,7 +116,7 @@ public class SecurityConfig  {
     @Bean
     JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+       jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
         jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName("scope");
 
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();

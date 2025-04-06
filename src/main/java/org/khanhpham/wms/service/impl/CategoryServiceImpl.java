@@ -1,7 +1,6 @@
 package org.khanhpham.wms.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -13,146 +12,125 @@ import org.khanhpham.wms.domain.response.PaginationResponse;
 import org.khanhpham.wms.exception.ResourceAlreadyExistException;
 import org.khanhpham.wms.exception.ResourceNotFoundException;
 import org.khanhpham.wms.repository.CategoryRepository;
+import org.khanhpham.wms.service.CacheService;
 import org.khanhpham.wms.service.CategoryService;
 import org.khanhpham.wms.utils.PaginationUtils;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
     private static final String CATEGORY = "Category";
-    private static final String REDIS_PREFIX_ID = "categories:id:";
-    private static final String REDIS_PREFIX_NAME = "categories:name:";
-    private static final String REDIS_PREFIX_PAGE = "categories:page:";
+    private static final String REDIS_PREFIX_ID = "category:id:";
+    private static final String REDIS_PREFIX_NAME = "category:name:";
+    private static final String REDIS_PREFIX_PATTERN = "categories:page:";
+    private static final Duration REDIS_TTL = Duration.ofHours(2);
 
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
-    private final ObjectMapper objectMapper;
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final CacheService cacheService;
 
     @Override
     @Transactional
-    @CachePut(value = "categories", key = "#result.id()")
-    public CategoryDTO createCategory(CategoryRequest categoryRequest) {
-        try {
-            Category category = categoryMapper.convertToEntity(categoryRequest);
-            return categoryMapper.convertToDTO(categoryRepository.save(category));
-        } catch (DataIntegrityViolationException e) {
-            log.error("Category already exists: {}", categoryRequest.getName());
-            throw new ResourceAlreadyExistException(CATEGORY, "name", categoryRequest.getName());
-        }
+    public CategoryDTO createCategory(@NotNull CategoryRequest categoryRequest) {
+        validateCategoryExistence(categoryRequest.getName());
+        Category category = categoryMapper.convertToEntity(categoryRequest);
+        CategoryDTO savedCategory = save(category);
+
+        updateCategoryCaches(savedCategory);
+
+        return savedCategory;
     }
 
     @Override
     @Transactional
-    @CachePut(value = "categories", key = "#result.id()")
     public CategoryDTO updateCategory(Long id, @NotNull CategoryRequest categoryRequest) {
-        Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(CATEGORY, "id", id));
+        Category category = findById(id);
+        String oldName = category.getName();
 
         category.setName(categoryRequest.getName());
         category.setDescription(categoryRequest.getDescription());
 
-        //        // Update cache
-//        String idKey = REDIS_PREFIX_ID + id;
-//        String nameKey = REDIS_PREFIX_NAME + updatedCategory.getName();
-//        redisTemplate.opsForValue().set(idKey, updatedCategory, Duration.ofHours(2));
-//        redisTemplate.opsForValue().set(nameKey, updatedCategory, Duration.ofHours(2));
-//
-//        // Invalidate pagination cache
-        invalidatePaginationCache();
+        CategoryDTO updatedCategory = save(category);
 
-        return categoryMapper.convertToDTO(categoryRepository.save(category));
+        if (!oldName.equals(updatedCategory.getName())) {
+            cacheService.evictByKeys(REDIS_PREFIX_NAME + oldName);
+        }
+
+        updateCategoryCaches(updatedCategory);
+
+        return updatedCategory;
     }
 
     @Override
     @Transactional
-    @CacheEvict(value = "categories", key = "#id")
     public void deleteCategory(Long id) {
-        Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(CATEGORY, "id", id));
-
+        Category category = findById(id);
         categoryRepository.delete(category);
 
-        // Remove from cache
-//        String idKey = REDIS_PREFIX_ID + id;
-//        String nameKey = REDIS_PREFIX_NAME + category.getName();
-//        redisTemplate.delete(idKey);
-//        redisTemplate.delete(nameKey);
-
-        // Invalidate pagination cache
-        invalidatePaginationCache();
+        cacheService.evictByKeys(
+                REDIS_PREFIX_ID + category.getId(),
+                REDIS_PREFIX_NAME + category.getName()
+        );
+        cacheService.evictByPattern(REDIS_PREFIX_PATTERN + "*");
     }
 
     @Override
     public CategoryDTO getCategoryById(Long id) {
         String key = REDIS_PREFIX_ID + id;
-
-        // Try to get from Redis first
-        CategoryDTO cachedCategory = (CategoryDTO) redisTemplate.opsForValue().get(key);
-        if (cachedCategory != null) {
-            return cachedCategory;
-        }
-
-        // If not in cache, fetch from database
-        CategoryDTO category = categoryRepository.findById(id)
-                .map(categoryMapper::convertToDTO)
-                .orElseThrow(() -> new ResourceNotFoundException(CATEGORY, "id", id));
-
-        // Cache the result
-        redisTemplate.opsForValue().set(key, category, Duration.ofHours(2));
-
-        return category;
+        return getOrCache(key, new TypeReference<>() {},
+                () -> categoryMapper.convertToDTO(findById(id))
+        );
     }
 
     @Override
     public CategoryDTO getCategoryByName(String name) {
         String key = REDIS_PREFIX_NAME + name;
-
-        // Try to get from Redis first
-        CategoryDTO cachedCategory = (CategoryDTO) redisTemplate.opsForValue().get(key);
-        if (cachedCategory != null) {
-            return cachedCategory;
-        }
-
-        // If not in cache, fetch from database
-        CategoryDTO category = categoryRepository.findByName(name)
-                .map(categoryMapper::convertToDTO)
-                .orElseThrow(() -> new ResourceNotFoundException(CATEGORY, "name", name));
-
-        // Cache the result
-        redisTemplate.opsForValue().set(key, category, Duration.ofHours(2));
-
-        return category;
+        Long categoryId = getOrCache(key, new TypeReference<>() {},
+                () -> findByName(name)).getId();
+        return getCategoryById(categoryId);
     }
 
     @Override
     public PaginationResponse<CategoryDTO> getAllCategories(int pageNumber, int pageSize, String sortBy, String sortDir) {
-        String key = REDIS_PREFIX_PAGE + pageNumber + ":" + pageSize + ":" + sortBy + ":" + sortDir;
+        String key = REDIS_PREFIX_PATTERN + pageNumber + ":" + pageSize + ":" + sortBy + ":" + sortDir;
+        return getOrCache(key, new TypeReference<>() {},
+                () -> getAllCategoriesFromDB(pageNumber, pageSize, sortBy, sortDir)
+        );
+    }
 
-        // Try to get from Redis first
-        Object cachedData = redisTemplate.opsForValue().get(key);
-        if (cachedData != null) {
-            if (cachedData instanceof PaginationResponse) {
-                return (PaginationResponse<CategoryDTO>) cachedData;
-            } else if (cachedData instanceof LinkedHashMap) {
-                return objectMapper.convertValue(cachedData, new TypeReference<>() {});
-            }
-        }
+    @Override
+    public List<Category> getAllById(Set<Long> ids) {
+        return categoryRepository.findAllById(ids);
+    }
 
-        // If not in cache, fetch from database
+    // ----------- Private Helpers -----------
+
+    private CategoryDTO save(Category category) {
+        return categoryMapper.convertToDTO(categoryRepository.save(category));
+    }
+
+    private Category findById(Long id) {
+        return categoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(CATEGORY, "id", id));
+    }
+
+    private CategoryDTO findByName(String name) {
+        return categoryRepository.findByName(name)
+                .map(categoryMapper::convertToDTO)
+                .orElseThrow(() -> new ResourceNotFoundException(CATEGORY, "name", name));
+    }
+
+    private @NotNull PaginationResponse<CategoryDTO> getAllCategoriesFromDB(
+            int pageNumber, int pageSize, String sortBy, String sortDir) {
         Page<Category> categories = categoryRepository.findAll(
                 PaginationUtils.convertToPageable(pageNumber, pageSize, sortBy, sortDir)
         );
@@ -162,28 +140,23 @@ public class CategoryServiceImpl implements CategoryService {
                 .map(categoryMapper::convertToDTO)
                 .toList();
 
-        PaginationResponse<CategoryDTO> response = PaginationUtils.createPaginationResponse(content, categories);
-
-        // Cache the result
-        redisTemplate.opsForValue().set(key, response, Duration.ofHours(2));
-
-        return response;
+        return PaginationUtils.createPaginationResponse(content, categories);
     }
 
-    @Override
-    public List<Category> getAllById(Set<Long> ids) {
-        return categoryRepository.findAllById(ids)
-                .stream()
-                .toList();
-    }
-
-    // Utility method to invalidate pagination cache
-    private void invalidatePaginationCache() {
-        Set<String> paginationKeys = redisTemplate.keys(REDIS_PREFIX_PAGE + "*");
-        if (!paginationKeys.isEmpty()) {
-            redisTemplate.delete(paginationKeys);
-        } else {
-            log.warn("No pagination cache found");
+    private void validateCategoryExistence(String name) {
+        if (categoryRepository.existsByName(name)) {
+            throw new ResourceAlreadyExistException(CATEGORY, "name", name);
         }
+    }
+
+    private void updateCategoryCaches(CategoryDTO dto) {
+        cacheService.cacheValue(REDIS_PREFIX_ID + dto.getId(), dto, REDIS_TTL);
+        cacheService.cacheValue(REDIS_PREFIX_NAME + dto.getName(), dto.getId(), REDIS_TTL);
+
+        cacheService.evictByPattern(REDIS_PREFIX_PATTERN + "*");
+    }
+
+    private <T> T getOrCache(String key, TypeReference<T> typeRef, Supplier<T> dbSupplier) {
+        return cacheService.getCached(key, typeRef, dbSupplier, REDIS_TTL);
     }
 }
